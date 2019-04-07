@@ -3,14 +3,19 @@ import PropTypes from 'prop-types';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
-import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
 import axios from 'axios';
+import { format } from 'date-fns';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Pagination from 'material-ui-flat-pagination';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import Typography from '@material-ui/core/Typography';
+import serverUrl from '../api/server';
 import WithDrawTableHead from './WithDrawTableHead';
 import WithDrawTableToolbar from './WithDrawTableToolbar';
-
 
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -47,28 +52,134 @@ const styles = theme => ({
   tableWrapper: {
     overflowX: 'auto',
   },
+  pagination: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '56px',
+
+  },
+  formControl: {
+    margin: theme.spacing.unit,
+    minWidth: 200,
+    maxWidth: 200,
+    height: '24px',
+    display: 'flex',
+  },
+  label: {
+    lineHeight: '1.8em',
+    marginRight: theme.spacing.unit * 2,
+    width: '200px',
+  },
+  sizeSelect: {
+    lineHeight: '1.8em',
+    borderBottom: 0,
+    fontSize: '12px',
+    '&:before': {
+      borderBottom: 0,
+    },
+    '&:after': {
+      borderBottom: 0,
+    },
+  },
 });
+const rowsPerPage = [5, 10, 15, 20];
 
 class WithDrawTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       order: 'asc',
-      orderBy: 'calories',
-      selected: [],
+      orderBy: 'price',
       data: [],
-      page: 0,
-      rowsPerPage: 5,
+      offset: 0,
+      size: 5,
+      currentPage: 1,
+      total: '',
+      selectedFromDate: new Date('2010-10-10T10:10:10').toString(),
+      selectedToDate: new Date().toString(),
+      searchString: '',
+      filterString: [],
+      filterItem: {
+        PROCESSED: 'status',
+        REJECTED: 'status',
+      },
+      selectedFilter: [],
+      dateRange: '',
+      isLoading: true,
     };
+
+    const localState = localStorage.getItem('withdrawState');
+    if (localState !== null && localState !== undefined) {
+      this.state = JSON.parse(localState);
+    } else {
+      localStorage.setItem('withdrawState', JSON.stringify(this.state));
+    }
   }
 
   componentDidMount() {
-    axios
-      .get('https://dynamic-table-server.herokuapp.com/withdraws.json')
-      .then((responese) => {
-        this.setState({ data: responese.data.trades });
-        window.console.log(responese.data.trades);
-      }).catch(err => window.console.error(err));
+    const { currentPage, size } = this.state;
+    const localState = localStorage.getItem('withdrawState');
+
+    if (localState !== null && localState !== undefined) {
+      this.handleTableUpdate();
+    } else {
+      axios
+        .get(`${serverUrl}/withdraws.json?[pagination][number]=${currentPage}&&[pagination][size]=${size}`)
+        .then((responese) => {
+          this.setState({
+            total: responese.data.pagination.total,
+            data: responese.data.trades,
+            isLoading: false,
+          });
+        }).catch((err) => {
+          this.setState({ isLoading: false });
+          window.console.error(err);
+        });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const {
+      searchString,
+      filterString,
+      selectedFromDate,
+      selectedToDate,
+      selectedFilter,
+      currentPage,
+      size,
+    } = this.state;
+
+    if (searchString !== prevState.searchString) {
+      this.handleTableUpdate();
+    }
+    if (selectedFilter !== prevState.selectedFilter) {
+      this.handleTableUpdate();
+    }
+    if (selectedFromDate !== prevState.selectedFromDate
+      || selectedToDate !== prevState.selectedToDate) {
+      this.handleTableUpdate();
+    }
+    if (filterString !== prevState.filterString) {
+      this.handleTableUpdate();
+    }
+    if (currentPage !== prevState.currentPage) {
+      this.handleTableUpdate();
+    }
+    if (size !== prevState.size) {
+      this.handleTableUpdate();
+    }
+  }
+
+  handlePageClick= (event, _offset, _currentPage) => {
+    this.setState({
+      offset: _offset,
+      currentPage: _currentPage,
+    });
+  }
+
+  handleSearchChange = (event) => {
+    this.setState({ searchString: event.target.value });
   }
 
   handleRequestSort = (event, property) => {
@@ -83,29 +194,147 @@ class WithDrawTable extends React.Component {
     this.setState({ order: newOrder, orderBy: newOrderBy });
   };
 
-  handleChangePage = (event, page) => {
-    this.setState({ page });
-  };
-
   handleChangeRowsPerPage = (event) => {
-    this.setState({ rowsPerPage: event.target.value });
+    this.setState({
+      size: event.target.value,
+    });
   };
 
-  isSelected = (id) => {
-    const { selected } = this.state;
-    return selected.indexOf(id) !== -1;
+  handleFromDateChange = (date) => {
+    const { selectedToDate } = this.state;
+
+    this.setState({
+      selectedFromDate: date.toString(),
+      dateRange: `filter[createdAt][gte]=${format(date, 'yyyy-MM-dd')}&&filter[createdAt][lte]=${format(new Date(selectedToDate), 'yyyy-MM-dd')}`,
+    });
+  };
+
+  handleToDateChange = (date) => {
+    const { selectedFromDate } = this.state;
+
+    this.setState({
+      selectedToDate: date.toString(),
+      dateRange: `filter[createdAt][gte]=${format(new Date(selectedFromDate), 'yyyy-MM-dd')}&&filter[createdAt][lte]=${format(date, 'yyyy-MM-dd')}`,
+    });
+  };
+
+  handleFilterChange = (event) => {
+    const newFilterString = event.target.value.map(item => (`filter[status]=${item.toUpperCase()}`));
+    this.setState({
+      selectedFilter: event.target.value,
+      filterString: newFilterString,
+    });
+  }
+
+  handleTableUpdate = () => {
+    const {
+      searchString,
+      dateRange,
+      filterString,
+      currentPage,
+      size,
+    } = this.state;
+    this.setState({ isLoading: true });
+    let newUrl = '';
+
+    filterString.forEach((item, i) => {
+      if (i === 0) {
+        newUrl += `${item}`;
+      } else {
+        newUrl += `&&${item}`;
+      }
+    });
+
+    if (searchString === '') {
+      axios.get(`${serverUrl}/withdraws.json?${newUrl}${dateRange}&&[pagination][number]=${currentPage}&&[pagination][size]=${size}`)
+        .then((responese) => {
+          this.setState({
+            total: responese.data.pagination.total,
+            data: responese.data.trades,
+            isLoading: false,
+          });
+          localStorage.setItem('withdrawState', JSON.stringify(this.state));
+        }).catch((err) => {
+          this.setState({ isLoading: false });
+          window.console.error(err);
+        });
+    } else {
+      axios.all([
+        axios.get(`${serverUrl}/withdraws.json?filter[uuid]=${searchString}&&${newUrl}${dateRange}`),
+        axios.get(`${serverUrl}/withdraws.json?filter[amount]=${searchString}&&${newUrl}${dateRange}`),
+        axios.get(`${serverUrl}/withdraws.json?filter[bankReferenceNumber]=${searchString}&&${newUrl}${dateRange}`),
+      ]).then(axios.spread((uuidRes, volumeRes, priceRes) => {
+        const searchResult = uuidRes.data.trades
+          .concat(priceRes.data.trades)
+          .concat(volumeRes.data.trades);
+        this.setState({
+          total: uuidRes.data.pagination.total
+          + volumeRes.data.pagination.total
+          + priceRes.data.pagination.total,
+          data: searchResult,
+          isLoading: false,
+        });
+        localStorage.setItem('withdrawState', JSON.stringify(this.state));
+      })).catch((err) => {
+        this.setState({ isLoading: false });
+        window.console.error(err);
+      });
+    }
+  }
+
+  handleReset = () => {
+    this.setState({
+      selectedFromDate: new Date('2010-10-10T10:10:10').toString(),
+      selectedToDate: new Date().toString(),
+      searchString: '',
+      filterString: [],
+      selectedFilter: [],
+      dateRange: '',
+      currentPage: 1,
+      offset: 0,
+      size: 5,
+    });
+    this.handleTableUpdate();
   }
 
   render() {
     const { classes } = this.props;
     const {
-      data, order, orderBy, rowsPerPage, page,
+      data,
+      order,
+      orderBy,
+      selectedFromDate,
+      selectedToDate,
+      searchString,
+      filterString,
+      side,
+      symbol,
+      filterItem,
+      selectedFilter,
+      isLoading,
+      offset,
+      size,
+      total,
     } = this.state;
-    const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
+    const emptyRows = size - data.length;
 
     return (
       <Paper className={classes.root}>
-        <WithDrawTableToolbar />
+        <WithDrawTableToolbar
+          handleFromDateChange={this.handleFromDateChange}
+          handleToDateChange={this.handleToDateChange}
+          handleSearchChange={this.handleSearchChange}
+          handleFilterChange={this.handleFilterChange}
+          selectedFromDate={selectedFromDate}
+          selectedToDate={selectedToDate}
+          searchString={searchString}
+          filterString={filterString}
+          side={side}
+          symbol={symbol}
+          filterItem={filterItem}
+          selectedFilter={selectedFilter}
+          handleReset={this.handleReset}
+        />
         <div className={classes.tableWrapper}>
           <Table className={classes.table} aria-labelledby="tableTitle">
             <WithDrawTableHead
@@ -115,10 +344,9 @@ class WithDrawTable extends React.Component {
               rowCount={data.length}
             />
             <TableBody>
-              {stableSort(data, getSorting(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              { data.length !== 0 ? (stableSort(data, getSorting(order, orderBy))
                 .map((n) => {
-                  const date = new Date(n.createdAt);
+                  const displayDate = format((n.createdAt), 'dd/MM/yyyy');
                   return (
                     <TableRow
                       hover
@@ -130,45 +358,63 @@ class WithDrawTable extends React.Component {
                       <TableCell component="th" scope="row" padding="none">
                         {n.uuid}
                       </TableCell>
-                      <TableCell align="right">{`${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`}</TableCell>
+                      <TableCell align="right">{displayDate}</TableCell>
                       <TableCell align="right">{n.status}</TableCell>
                       <TableCell align="right">{n.amount}</TableCell>
                       <TableCell align="right">{n.bankReferenceNumber}</TableCell>
                     </TableRow>
                   );
-                })}
+                })) : (
+                  <TableRow
+                    hover
+                    role="checkbox"
+                    tabIndex={-1}
+                  />)
+              }
               {emptyRows > 0 && (
-                <TableRow style={{ height: 49 * emptyRows }}>
+                <TableRow style={{ height: 48 * emptyRows }}>
                   <TableCell colSpan={6} />
                 </TableRow>
               )}
             </TableBody>
           </Table>
         </div>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={data.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          backIconButtonProps={{
-            'aria-label': 'Previous Page',
-          }}
-          nextIconButtonProps={{
-            'aria-label': 'Next Page',
-          }}
-          onChangePage={this.handleChangePage}
-          onChangeRowsPerPage={this.handleChangeRowsPerPage}
-        />
+        <div className={classes.pagination}>
+          <div className={classes.formControl}>
+            <Typography variant="caption" align="center" color="textPrimary" className={classes.label}>
+              Rows per page:
+            </Typography>
+            <Select
+              className={classes.sizeSelect}
+              value={size}
+              onChange={e => this.handleChangeRowsPerPage(e)}
+            >
+              {
+                rowsPerPage.map(item => (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                ))
+              }
+            </Select>
+          </div>
+          <Pagination
+            limit={size}
+            offset={offset}
+            total={total}
+            onClick={
+              (event, _offset, _currentPage) => this.handlePageClick(event, _offset, _currentPage)
+            }
+          />
+        </div>
+        { isLoading ? (<LinearProgress color="secondary" />) : null }
       </Paper>
     );
   }
 }
 
 WithDrawTable.propTypes = {
-  classes: PropTypes.shape({
-    classes: PropTypes.object,
-  }).isRequired,
+  classes: PropTypes.instanceOf(Object).isRequired,
 };
 
 export default withStyles(styles)(WithDrawTable);

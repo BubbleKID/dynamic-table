@@ -13,10 +13,10 @@ import Pagination from 'material-ui-flat-pagination';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Typography from '@material-ui/core/Typography';
+import serverUrl from '../api/server';
 import TradeTableHead from './TradeTableHead';
 import TradeTableToolbar from './TradeTableToolbar';
 
-const serverUrl = 'https://dynamic-table-server.herokuapp.com';
 function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -112,17 +112,17 @@ class TradeTable extends React.Component {
       isLoading: true,
     };
 
-    const localState = localStorage.getItem('localState');
+    const localState = localStorage.getItem('tradeState');
     if (localState !== null && localState !== undefined) {
       this.state = JSON.parse(localState);
     } else {
-      localStorage.setItem('localState', JSON.stringify(this.state));
+      localStorage.setItem('tradeState', JSON.stringify(this.state));
     }
   }
 
   componentDidMount() {
     const { currentPage, size } = this.state;
-    const localState = localStorage.getItem('localState');
+    const localState = localStorage.getItem('tradeState');
 
     if (localState !== null && localState !== undefined) {
       this.handleTableUpdate();
@@ -268,7 +268,7 @@ class TradeTable extends React.Component {
             data: responese.data.trades,
             isLoading: false,
           });
-          localStorage.setItem('localState', JSON.stringify(this.state));
+          localStorage.setItem('tradeState', JSON.stringify(this.state));
         }).catch((err) => {
           this.setState({ isLoading: false });
           window.console.error(err);
@@ -289,7 +289,7 @@ class TradeTable extends React.Component {
           data: searchResult,
           isLoading: false,
         });
-        localStorage.setItem('localState', JSON.stringify(this.state));
+        localStorage.setItem('tradeState', JSON.stringify(this.state));
       })).catch((err) => {
         this.setState({ isLoading: false });
         window.console.error(err);
