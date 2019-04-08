@@ -6,9 +6,17 @@ import sinon from 'sinon';
 
 it("shoud call event handler when select changes", () => {
   const mockMyEventHandler = jest.fn();
+  const renderValueHandler = jest.fn();
   let wrapper = shallow(
     <TradeTableToolbar
       handleFilterChange={mockMyEventHandler}
+      handleFromDateChange={jest.fn()}
+      handleToDateChange={jest.fn()}
+      handleSearchChange={jest.fn()}
+      selectedFromDate={''}
+      selectedToDate={''}
+      searchString={''}
+      handleReset={jest.fn()}
       filterItem={{
         ASK: 'side',
         BID: 'side',

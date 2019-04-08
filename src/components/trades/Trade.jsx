@@ -3,9 +3,9 @@ import TradeTable from './TradeTable';
 import Container from '../../container/Container';
 
 const Trade = () => (
-  <div>
+  <React.Fragment>
     <Container name="Trades" table={<TradeTable />} />
-  </div>
+  </React.Fragment>
 );
 
 export default Trade;

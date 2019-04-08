@@ -3,9 +3,9 @@ import WithDrawTable from './WithDrawTable';
 import Container from '../../container/Container';
 
 const Trade = () => (
-  <div>
+  <React.Fragment>
     <Container name="Withdraws" table={<WithDrawTable />} />
-  </div>
+  </React.Fragment>
 );
 
 export default Trade;

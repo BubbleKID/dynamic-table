@@ -1,7 +1,7 @@
 # Dynamic Table
 
-[![NPM Version][npm-image]][npm-url]
-[![Build Status][travis-image]][travis-url]
+### Status
+[![Build Status](https://api.travis-ci.org/BubbleKID/dynamic-table.png)](https://travis-ci.org/BubbleKID/dynamic-table/)
 
 One to two paragraph statement about your product and what it does.
 
