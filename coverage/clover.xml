@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1554651066461" clover="3.2.0">
-  <project timestamp="1554651066461" name="All files">
+<coverage generated="1554686479521" clover="3.2.0">
+  <project timestamp="1554686479521" name="All files">
     <metrics statements="232" coveredstatements="68" conditionals="112" coveredconditionals="27" methods="93" coveredmethods="18" elements="437" coveredelements="113" complexity="0" loc="232" ncloc="232" packages="5" files="11" classes="11"/>
     <package name="src">
       <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
@@ -274,12 +274,12 @@
       <metrics statements="6" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="2"/>
       <file name="Container.jsx" path="C:\Users\Mtech\Desktop\dynamic-table\src\container\Container.jsx">
         <metrics statements="6" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="2"/>
-        <line num="14" count="2" type="stmt"/>
+        <line num="14" count="1" type="stmt"/>
         <line num="45" count="1" type="stmt"/>
         <line num="46" count="1" type="stmt"/>
         <line num="55" count="0" type="stmt"/>
         <line num="58" count="0" type="stmt"/>
-        <line num="83" count="2" type="stmt"/>
+        <line num="83" count="1" type="stmt"/>
       </file>
     </package>
   </project>
