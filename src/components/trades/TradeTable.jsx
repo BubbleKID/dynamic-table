@@ -17,7 +17,7 @@ import serverUrl from '../api/server';
 import TradeTableHead from './TradeTableHead';
 import TradeTableToolbar from './TradeTableToolbar';
 
-function desc(a, b, orderBy) {
+export function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -27,8 +27,9 @@ function desc(a, b, orderBy) {
   return 0;
 }
 
-function stableSort(array, cmp) {
+export function stableSort(array, cmp) {
   const stabilizedThis = array.map((el, index) => [el, index]);
+
   stabilizedThis.sort((a, b) => {
     const order = cmp(a[0], b[0]);
     if (order !== 0) return order;
@@ -37,7 +38,7 @@ function stableSort(array, cmp) {
   return stabilizedThis.map(el => el[0]);
 }
 
-function getSorting(order, orderBy) {
+export function getSorting(order, orderBy) {
   return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
 }
 
@@ -153,7 +154,6 @@ class TradeTable extends React.Component {
       size,
     } = this.state;
 
-    // debugger
     if (searchString !== prevState.searchString) {
       this.handleTableUpdate();
     }

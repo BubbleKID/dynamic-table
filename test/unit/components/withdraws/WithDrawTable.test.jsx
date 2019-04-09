@@ -1,25 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import TradeTable from '../../../../src/components/trades/TradeTable';
+import WithDrawTable from '../../../../src/components/withdraws/WithDrawTable';
 import Select from '@material-ui/core/Select';
 import { shallow, mount } from 'enzyme';
-import { desc, stableSort, getSorting } from '../../../../src/components/trades/TradeTable';
-import axios from 'axios';
-import '../../../../src/components/api/server';
-import App from '../../../../src/App';
-import sinon from 'sinon';
+import { desc, stableSort, getSorting } from '../../../../src/components/withdraws/WithDrawTable';
 
 describe('Test TradeTable', () => {
   it('renders without crashing', () => {
     const div = document.createElement('div');
-    ReactDOM.render(<TradeTable />, div);
+    ReactDOM.render(<WithDrawTable />, div);
     ReactDOM.unmountComponentAtNode(div);
   });
 
   it("shoud call event handler when select changes", () => {
     const mockMyEventHandler = jest.fn();
     let wrapper = shallow(
-      <TradeTable />
+      <WithDrawTable />
     ).dive();
     wrapper.setProps({ onChange: mockMyEventHandler });
     wrapper.find(Select).at(0).simulate('change', {target:{value:5}});
@@ -27,14 +23,14 @@ describe('Test TradeTable', () => {
   })
 
   it("desc function should work correctly", () => {
-    expect(desc({price: 10},{price:20}, 'price')).toBe(1);
-    expect(desc({price: 20},{price:10}, 'price')).toBe(-1);
-    expect(desc('a', 'b', 'price')).toBe(0);
+    expect(desc({amount: 100},{amount:200}, 'amount')).toBe(1);
+    expect(desc({amount: 200},{amount:100}, 'amount')).toBe(-1);
+    expect(desc('a', 'b', 'amount')).toBe(0);
   })
 
   it("stableSort function should work correctly", () => {
-    expect(stableSort([{price: 10},{price:20}],getSorting('desc', 'price'))).toEqual([{"price": 20}, {"price": 10}]);
-    expect(stableSort([{price: 10},{price:20}],getSorting(0, 'price'))).toEqual([{"price": 10}, {"price": 20}]);
+    expect(stableSort([{amount: 100},{amount:200}],getSorting('desc', 'amount'))).toEqual([{"amount": 200}, {"amount": 100}]);
+    expect(stableSort([{amount: 100},{amount:200}],getSorting(0, 'amount'))).toEqual([{"amount": 100}, {"amount": 200}]);
     expect(stableSort(['', ''],getSorting('', ''))).toEqual(['','']);
   });
 });

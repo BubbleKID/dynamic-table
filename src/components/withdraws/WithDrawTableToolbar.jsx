@@ -228,6 +228,7 @@ let WithDrawTableToolbar = (props) => {
             input={<Input id="select-filter" />}
             renderValue={selected => selected.join(', ')}
             MenuProps={MenuProps}
+            id="filter-select"
           >
             {Object.keys(filterItem).map(key => (
               <MenuItem key={key} value={key}>

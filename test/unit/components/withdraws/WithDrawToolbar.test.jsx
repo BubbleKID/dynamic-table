@@ -1,12 +1,12 @@
 import React from 'react';
-import TradeTableToolbar from '../../../../src/components/trades/TradeTableToolbar';
-import { shallow } from 'enzyme';
+import WithDrawTableToolbar from '../../../../src/components/withdraws/WithDrawTableToolbar';
+import { shallow, mount } from 'enzyme';
 
-describe("TradeTableToolbar", ()=>{
+describe("WithDrawTableToolbar", ()=>{
   let wrapper;
   beforeEach(() => {
     wrapper = shallow(
-      <TradeTableToolbar
+      <WithDrawTableToolbar
         handleFilterChange={jest.fn()}
         handleFromDateChange={jest.fn()}
         handleToDateChange={jest.fn()}
@@ -16,16 +16,14 @@ describe("TradeTableToolbar", ()=>{
         searchString={''}
         handleReset={jest.fn()}
         filterItem={{
-          ASK: 'side',
-          BID: 'side',
-          'BTC/AUD': 'symbol',
-          'ETH/AUD': 'symbol',
-          'ETH/BTC': 'symbol',
+          PROCESSED: 'status',
+          REJECTED: 'status',
         }}
-        selectedFilter={['BID', 'ASK']}
+        selectedFilter={['PROCESSED']}
       />
     ).dive();
   });
+
   it("shoud call event handler when select changes", () => {
     const mockMyEventHandler = jest.fn();
     wrapper.setProps({ onChange: mockMyEventHandler });
@@ -34,8 +32,8 @@ describe("TradeTableToolbar", ()=>{
   });
 
   it("shoud call renderValue correctlt when select filter", () => {
-    expect(wrapper.find('#filter-select').props().renderValue(['BID', 'ASK'])).toEqual('BID, ASK');
+    expect(wrapper.find('#filter-select').props().renderValue(['PROCESSED', 'REJECTED'])).toEqual('PROCESSED, REJECTED');
   });
-})
+});
 
 

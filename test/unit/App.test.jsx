@@ -1,6 +1,6 @@
 import React from 'react';
 import { MemoryRouter } from 'react-router';
-import { mount} from 'enzyme';
+import { mount } from 'enzyme';
 import App from '../../src/App';
 import Trade from '../../src/components/trades/Trade';
 
