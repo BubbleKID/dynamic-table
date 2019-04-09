@@ -1,3 +1,3 @@
-const serverUrl = 'http://localhost:3000';
+const serverUrl = 'https://dynamic-server.herokuapp.com';
 
 export default serverUrl;

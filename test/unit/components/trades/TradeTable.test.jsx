@@ -8,6 +8,9 @@ import axios from 'axios';
 import '../../../../src/components/api/server';
 import App from '../../../../src/App';
 import sinon from 'sinon';
+import TradeTableToolbar from '../../../../src/components/trades/TradeTableToolbar';
+import Pagination from 'material-ui-flat-pagination';
+import { expect as chai_expect } from 'chai';
 
 describe('Test TradeTable', () => {
   it('renders without crashing', () => {
@@ -36,5 +39,12 @@ describe('Test TradeTable', () => {
     expect(stableSort([{price: 10},{price:20}],getSorting('desc', 'price'))).toEqual([{"price": 20}, {"price": 10}]);
     expect(stableSort([{price: 10},{price:20}],getSorting(0, 'price'))).toEqual([{"price": 10}, {"price": 20}]);
     expect(stableSort(['', ''],getSorting('', ''))).toEqual(['','']);
+  });
+
+  it('simulates click events', () => {
+    const handleSearchChange = sinon.spy();
+    const wrapper = mount(<TradeTable handleSearchChange={handleSearchChange} />);
+    wrapper.find('#searchBar').at(0).simulate('change');
+    expect(handleSearchChange).toHaveBeenCalledOnce;
   });
 });

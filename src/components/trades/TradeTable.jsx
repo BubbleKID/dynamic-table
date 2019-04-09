@@ -421,6 +421,7 @@ class TradeTable extends React.Component {
             onClick={
               (event, _offset, _currentPage) => this.handlePageClick(event, _offset, _currentPage)
             }
+            id="pagination"
           />
         </div>
         { isLoading ? (<LinearProgress color="secondary" />) : null }

@@ -196,6 +196,7 @@ let TradeTableToolbar = (props) => {
           }}
           value={searchString}
           onChange={handleSearchChange}
+          id="searchBar"
         />
       </div>
       <div className={classes.datepicker}>
