@@ -242,7 +242,7 @@ let TradeTableToolbar = (props) => {
       </div>
       <div className={classes.buttonContainer}>
         <FormControl>
-          <Button variant="outlined" color="secondary" onClick={handleReset}>
+          <Button id="reset" variant="outlined" color="secondary" onClick={handleReset}>
             Reset
           </Button>
         </FormControl>

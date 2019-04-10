@@ -115,28 +115,20 @@ class WithDrawTable extends React.Component {
     } else {
       localStorage.setItem('withdrawState', JSON.stringify(this.state));
     }
+    this.handlePageClick = this.handlePageClick.bind(this);
+    this.handleSearchChange = this.handleSearchChange.bind(this);
+    this.handleRequestSort = this.handleRequestSort.bind(this);
+    this.handleChangeRowsPerPage = this.handleChangeRowsPerPage.bind(this);
+    this.handleFromDateChange = this.handleFromDateChange.bind(this);
+    this.handleToDateChange = this.handleToDateChange.bind(this);
+    this.handleFilterChange = this.handleFilterChange.bind(this);
+    this.handleTableUpdate = this.handleTableUpdate.bind(this);
+    this.handleReset = this.handleReset.bind(this);
+    this.handleCreateTable = this.handleCreateTable.bind(this);
   }
 
   componentDidMount() {
-    const { currentPage, size } = this.state;
-    const localState = localStorage.getItem('withdrawState');
-
-    if (localState !== null && localState !== undefined) {
-      this.handleTableUpdate();
-    } else {
-      axios
-        .get(`${serverUrl}/withdraws.json?[pagination][number]=${currentPage}&&[pagination][size]=${size}`)
-        .then((responese) => {
-          this.setState({
-            total: responese.data.pagination.total,
-            data: responese.data.trades,
-            isLoading: false,
-          });
-        }).catch((err) => {
-          this.setState({ isLoading: false });
-          window.console.error(err);
-        });
-    }
+    this.handleTableUpdate();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -171,18 +163,18 @@ class WithDrawTable extends React.Component {
     }
   }
 
-  handlePageClick= (event, _offset, _currentPage) => {
+  handlePageClick(event, _offset, _currentPage) {
     this.setState({
       offset: _offset,
       currentPage: _currentPage,
     });
   }
 
-  handleSearchChange = (event) => {
+  handleSearchChange(event) {
     this.setState({ searchString: event.target.value });
   }
 
-  handleRequestSort = (event, property) => {
+  handleRequestSort(event, property) {
     const newOrderBy = property;
     let newOrder = 'desc';
 
@@ -192,33 +184,33 @@ class WithDrawTable extends React.Component {
     }
 
     this.setState({ order: newOrder, orderBy: newOrderBy });
-  };
+  }
 
-  handleChangeRowsPerPage = (event) => {
+  handleChangeRowsPerPage(event) {
     this.setState({
       size: event.target.value,
     });
-  };
+  }
 
-  handleFromDateChange = (date) => {
+  handleFromDateChange(date) {
     const { selectedToDate } = this.state;
 
     this.setState({
       selectedFromDate: date.toString(),
       dateRange: `filter[createdAt][gte]=${format(date, 'yyyy-MM-dd')}&&filter[createdAt][lte]=${format(new Date(selectedToDate), 'yyyy-MM-dd')}`,
     });
-  };
+  }
 
-  handleToDateChange = (date) => {
+  handleToDateChange(date) {
     const { selectedFromDate } = this.state;
 
     this.setState({
       selectedToDate: date.toString(),
       dateRange: `filter[createdAt][gte]=${format(new Date(selectedFromDate), 'yyyy-MM-dd')}&&filter[createdAt][lte]=${format(date, 'yyyy-MM-dd')}`,
     });
-  };
+  }
 
-  handleFilterChange = (event) => {
+  handleFilterChange(event) {
     const newFilterString = event.target.value.map(item => (`filter[status]=${item.toUpperCase()}`));
     this.setState({
       selectedFilter: event.target.value,
@@ -226,7 +218,7 @@ class WithDrawTable extends React.Component {
     });
   }
 
-  handleTableUpdate = () => {
+  handleTableUpdate() {
     const {
       searchString,
       dateRange,
@@ -282,7 +274,48 @@ class WithDrawTable extends React.Component {
     }
   }
 
-  handleReset = () => {
+  handleCreateTable(data) {
+    const { order, orderBy } = this.state;
+    let displayDate;
+    let table = '';
+
+    if (data.length === 0) {
+      table = (
+        <TableRow
+          hover
+          role="checkbox"
+          tabIndex={-1}
+        />
+      );
+    } else {
+      table = stableSort(data, getSorting(order, orderBy))
+        .map(
+          (n) => {
+            displayDate = format((n.createdAt), 'dd/MM/yyyy');
+            return (
+              <TableRow
+                hover
+                role="checkbox"
+                tabIndex={-1}
+                key={n.uuid}
+              >
+                <TableCell padding="checkbox" />
+                <TableCell component="th" scope="row" padding="none">
+                  {n.uuid}
+                </TableCell>
+                <TableCell align="right">{displayDate}</TableCell>
+                <TableCell align="right">{n.status}</TableCell>
+                <TableCell align="right">{n.amount}</TableCell>
+                <TableCell align="right">{n.bankReferenceNumber}</TableCell>
+              </TableRow>
+            );
+          },
+        );
+    }
+    return table;
+  }
+
+  handleReset() {
     this.setState({
       selectedFromDate: new Date('2010-10-10T10:10:10').toString(),
       selectedToDate: new Date().toString(),
@@ -344,33 +377,7 @@ class WithDrawTable extends React.Component {
               rowCount={data.length}
             />
             <TableBody>
-              { data.length !== 0 ? (stableSort(data, getSorting(order, orderBy))
-                .map((n) => {
-                  const displayDate = format((n.createdAt), 'dd/MM/yyyy');
-                  return (
-                    <TableRow
-                      hover
-                      role="checkbox"
-                      tabIndex={-1}
-                      key={n.uuid}
-                    >
-                      <TableCell padding="checkbox" />
-                      <TableCell component="th" scope="row" padding="none">
-                        {n.uuid}
-                      </TableCell>
-                      <TableCell align="right">{displayDate}</TableCell>
-                      <TableCell align="right">{n.status}</TableCell>
-                      <TableCell align="right">{n.amount}</TableCell>
-                      <TableCell align="right">{n.bankReferenceNumber}</TableCell>
-                    </TableRow>
-                  );
-                })) : (
-                  <TableRow
-                    hover
-                    role="checkbox"
-                    tabIndex={-1}
-                  />)
-              }
+              {this.handleCreateTable(data)}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 48 * emptyRows }}>
                   <TableCell colSpan={6} />
@@ -405,6 +412,7 @@ class WithDrawTable extends React.Component {
             onClick={
               (event, _offset, _currentPage) => this.handlePageClick(event, _offset, _currentPage)
             }
+            id="pagination"
           />
         </div>
         { isLoading ? (<LinearProgress color="secondary" />) : null }
