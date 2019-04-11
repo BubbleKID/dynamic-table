@@ -33,7 +33,7 @@ https://dynamic-table-server.herokuapp.com
 ### Start
 
 ```sh
-npm start
+npm run dev
 ```
 
 ### Test
