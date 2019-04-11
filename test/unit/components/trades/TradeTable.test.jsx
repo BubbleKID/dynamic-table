@@ -98,14 +98,18 @@ describe('Test TradeTable', () => {
     const shallowNew = createShallow({ dive: true });
     const wrapper = shallowNew(<TradeTable />);
     wrapper.instance().handleFromDateChange(new Date('2010-10-10T10:10:10'));
-    expect(wrapper.state('selectedFromDate')).toEqual('Sun Oct 10 2010 10:10:10 GMT+1100 (澳大利亚东部夏令时)');
+    const dateString = wrapper.state('selectedFromDate');
+    const convertDate = new Date(dateString).toLocaleDateString('en-US');
+    expect(convertDate).toEqual('10/10/2010');
   });
 
   it('handleToDateChange() works correctly', () => {
     const shallowNew = createShallow({ dive: true });
     const wrapper = shallowNew(<TradeTable />);
     wrapper.instance().handleToDateChange(new Date('2010-10-10T10:10:10'));
-    expect(wrapper.state('selectedToDate')).toEqual('Sun Oct 10 2010 10:10:10 GMT+1100 (澳大利亚东部夏令时)');
+    const dateString = wrapper.state('selectedToDate');
+    const convertDate = new Date(dateString).toLocaleDateString('en-US');
+    expect(convertDate).toEqual('10/10/2010');
   });
 
   it('handleFilterChange() works correctly', () => {

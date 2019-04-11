@@ -1,13 +1,16 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { createShallow } from '@material-ui/core/test-utils';
+import Select from '@material-ui/core/Select';
 import WithDrawTableToolbar from '../../../../src/components/withdraws/WithDrawTableToolbar';
 
 describe('WithDrawTableToolbar', () => {
+  const mockMyEventHandler = jest.fn();
   let wrapper;
+  const shallowNew = createShallow({ dive: true });
   beforeEach(() => {
-    wrapper = shallow(
+    wrapper = shallowNew(
       <WithDrawTableToolbar
-        handleFilterChange={jest.fn()}
+        handleFilterChange={mockMyEventHandler}
         handleFromDateChange={jest.fn()}
         handleToDateChange={jest.fn()}
         handleSearchChange={jest.fn()}
@@ -25,10 +28,9 @@ describe('WithDrawTableToolbar', () => {
   });
 
   it('shoud call event handler when select changes', () => {
-    const mockMyEventHandler = jest.fn();
-    wrapper.setProps({ onChange: mockMyEventHandler });
-    wrapper.find('#filter-select').at(0).simulate('change');
-    expect(mockMyEventHandler).toHaveBeenCalledOnce;
+    wrapper.setProps({ handleFilterChange: mockMyEventHandler });
+    wrapper.find(Select).simulate('change', { target: { value: 'aaaa' } });
+    expect(mockMyEventHandler).toHaveBeenCalled();
   });
 
   it('shoud call renderValue correctlt when select filter', () => {
