@@ -9,7 +9,8 @@
     "dev": "webpack-dev-server --open --mode development",
     "test": "jest --coverage",
     "build": "webpack --mode production",
-    "heroku-postbuild": "webpack -p"
+    "heroku-postbuild": "webpack -p",
+    "coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls"
   },
   "author": "Xin Chen",
   "license": "ISC",
@@ -23,6 +24,7 @@
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.7.1",
     "babel-loader": "^8.0.5",
+    "coveralls": "^3.0.3",
     "css-loader": "^2.1.1",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.12.1",

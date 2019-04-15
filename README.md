@@ -1,5 +1,6 @@
 # Dynamic Table
 [![Build Status](https://api.travis-ci.org/BubbleKID/dynamic-table.png)](https://travis-ci.org/BubbleKID/dynamic-table/)
+[![Coverage Status](https://coveralls.io/repos/github/BubbleKID/dynamic-table/badge.svg?branch=master)](https://coveralls.io/github/BubbleKID/dynamic-table?branch=master)
 
 Screentshot
 
@@ -41,8 +42,6 @@ npm run dev
 ```sh
 npm test
 ```
-
-![tests](tests.png)
 
 ### Build
 
