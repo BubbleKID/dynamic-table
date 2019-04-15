@@ -40,7 +40,7 @@ function Container(props) {
   const {
     classes,
     name,
-    table,
+    children,
     history,
   } = props;
   return (
@@ -72,7 +72,7 @@ function Container(props) {
         <div className={classNames(classes.layout, classes.cardGrid)}>
           {/* End hero unit */}
           <Grid container spacing={40}>
-            {table}
+            {children}
           </Grid>
         </div>
       </main>
@@ -83,8 +83,8 @@ function Container(props) {
 Container.propTypes = {
   classes: PropTypes.instanceOf(Object).isRequired,
   name: PropTypes.string.isRequired,
-  table: PropTypes.instanceOf(Object).isRequired,
   history: PropTypes.instanceOf(Object).isRequired,
+  children: PropTypes.instanceOf(Object).isRequired,
 };
 
 export default withRouter(withStyles(styles)(Container));

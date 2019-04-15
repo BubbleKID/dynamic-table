@@ -1,12 +1,12 @@
 # Dynamic Table
-
-### Status
 [![Build Status](https://api.travis-ci.org/BubbleKID/dynamic-table.png)](https://travis-ci.org/BubbleKID/dynamic-table/)
 
-One to two paragraph statement about your product and what it does.
+Screentshot
 
 ![screenshot](screenshot.png)
 
+## Demo
+https://dynamic-table-new.herokuapp.com/
 ## Installation
 
 NPM:
@@ -41,6 +41,8 @@ npm run dev
 ```sh
 npm test
 ```
+
+![tests](tests.png)
 
 ### Build
 

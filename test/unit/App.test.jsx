@@ -1,15 +1,15 @@
 import React from 'react';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 import { mount } from 'enzyme';
 import App from '../../src/App';
-import Trade from '../../src/components/trades/Trade';
+import TradeTable from '../../src/components/trades/TradeTable';
 
 
-it("it render Trade correctly", () => {
+it('it render Trade correctly', () => {
   const wrapper = mount(
     <MemoryRouter initialEntries={['/']}>
       <App />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
-  expect(wrapper.find(Trade)).toHaveLength(1);
+  expect(wrapper.find(TradeTable)).toHaveLength(1);
 });

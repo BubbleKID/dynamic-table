@@ -1,13 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import Trade from './components/trades/Trade';
-import WithDraw from './components/withdraws/WithDraw';
+import TradeTable from './components/trades/TradeTable';
+import WithDrawTable from './components/withdraws/WithDrawTable';
 
 const App = () => (
   <Router>
-    <Route exact path="/" component={Trade} />
-    <Route path="/trades" component={Trade} />
-    <Route path="/withdraws" component={WithDraw} />
+    <Route exact path="/" component={TradeTable} />
+    <Route path="/trades" component={TradeTable} />
+    <Route path="/withdraws" component={WithDrawTable} />
   </Router>
 );
 

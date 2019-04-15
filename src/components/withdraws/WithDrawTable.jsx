@@ -14,8 +14,9 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Typography from '@material-ui/core/Typography';
 import serverUrl from '../api/server';
-import WithDrawTableHead from './WithDrawTableHead';
-import WithDrawTableToolbar from './WithDrawTableToolbar';
+import CustomTableHead from '../tableComponents/CustomTableHead';
+import CustomTableToolbar from '../tableComponents/CustomTableToolbar';
+import Container from '../../container/Container';
 
 export function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -84,6 +85,23 @@ const styles = theme => ({
   },
 });
 const rowsPerPage = [5, 10, 15, 20];
+const rows = [
+  {
+    id: 'uuid', numeric: false, disablePadding: true, label: 'Uuid',
+  },
+  {
+    id: 'createdAt', numeric: true, disablePadding: false, label: 'Created at',
+  },
+  {
+    id: 'status', numeric: true, disablePadding: false, label: 'Status',
+  },
+  {
+    id: 'amount', numeric: true, disablePadding: false, label: 'Amount',
+  },
+  {
+    id: 'bankReferenceNumber', numeric: true, disablePadding: false, label: 'Bank Reference Number',
+  },
+];
 
 class WithDrawTable extends React.Component {
   constructor(props) {
@@ -105,8 +123,9 @@ class WithDrawTable extends React.Component {
         REJECTED: 'status',
       },
       selectedFilter: [],
-      dateRange: '',
+      dateUrl: '',
       isLoading: true,
+      isReset: false,
     };
 
     const localState = localStorage.getItem('withdrawState');
@@ -125,6 +144,7 @@ class WithDrawTable extends React.Component {
     this.handleTableUpdate = this.handleTableUpdate.bind(this);
     this.handleReset = this.handleReset.bind(this);
     this.handleCreateTable = this.handleCreateTable.bind(this);
+    this.getFilterUrl = this.getFilterUrl.bind(this);
   }
 
   componentDidMount() {
@@ -134,33 +154,46 @@ class WithDrawTable extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     const {
       searchString,
-      filterString,
       selectedFromDate,
       selectedToDate,
       selectedFilter,
       currentPage,
       size,
+      isReset,
     } = this.state;
 
-    if (searchString !== prevState.searchString) {
-      this.handleTableUpdate();
+    if (isReset !== true) {
+      if (searchString !== prevState.searchString) {
+        this.handleTableUpdate();
+      }
+      if (selectedFilter !== prevState.selectedFilter) {
+        this.handleTableUpdate();
+      }
+      if (selectedFromDate !== prevState.selectedFromDate
+        || selectedToDate !== prevState.selectedToDate) {
+        this.handleTableUpdate();
+      }
+      if (currentPage !== prevState.currentPage) {
+        this.handleTableUpdate();
+      }
+      if (size !== prevState.size) {
+        this.handleTableUpdate();
+      }
     }
-    if (selectedFilter !== prevState.selectedFilter) {
-      this.handleTableUpdate();
-    }
-    if (selectedFromDate !== prevState.selectedFromDate
-      || selectedToDate !== prevState.selectedToDate) {
-      this.handleTableUpdate();
-    }
-    if (filterString !== prevState.filterString) {
-      this.handleTableUpdate();
-    }
-    if (currentPage !== prevState.currentPage) {
-      this.handleTableUpdate();
-    }
-    if (size !== prevState.size) {
-      this.handleTableUpdate();
-    }
+  }
+
+  getFilterUrl() {
+    const { filterString } = this.state;
+    let filterUrl = '';
+
+    filterString.forEach((item, i) => {
+      if (i === 0) {
+        filterUrl += `${item}`;
+      } else {
+        filterUrl += `&&${item}`;
+      }
+    });
+    return filterUrl;
   }
 
   handlePageClick(event, _offset, _currentPage) {
@@ -197,7 +230,7 @@ class WithDrawTable extends React.Component {
 
     this.setState({
       selectedFromDate: date.toString(),
-      dateRange: `filter[createdAt][gte]=${format(date, 'yyyy-MM-dd')}&&filter[createdAt][lte]=${format(new Date(selectedToDate), 'yyyy-MM-dd')}`,
+      dateUrl: `filter[createdAt][gte]=${format(date, 'yyyy-MM-dd')}&&filter[createdAt][lte]=${format(new Date(selectedToDate), 'yyyy-MM-dd')}&&`,
     });
   }
 
@@ -206,7 +239,7 @@ class WithDrawTable extends React.Component {
 
     this.setState({
       selectedToDate: date.toString(),
-      dateRange: `filter[createdAt][gte]=${format(new Date(selectedFromDate), 'yyyy-MM-dd')}&&filter[createdAt][lte]=${format(date, 'yyyy-MM-dd')}`,
+      dateUrl: `filter[createdAt][gte]=${format(new Date(selectedFromDate), 'yyyy-MM-dd')}&&filter[createdAt][lte]=${format(date, 'yyyy-MM-dd')}&&`,
     });
   }
 
@@ -216,62 +249,6 @@ class WithDrawTable extends React.Component {
       selectedFilter: event.target.value,
       filterString: newFilterString,
     });
-  }
-
-  handleTableUpdate() {
-    const {
-      searchString,
-      dateRange,
-      filterString,
-      currentPage,
-      size,
-    } = this.state;
-    this.setState({ isLoading: true });
-    let newUrl = '';
-
-    filterString.forEach((item, i) => {
-      if (i === 0) {
-        newUrl += `${item}`;
-      } else {
-        newUrl += `&&${item}`;
-      }
-    });
-
-    if (searchString === '') {
-      axios.get(`${serverUrl}/withdraws.json?${newUrl}${dateRange}&&[pagination][number]=${currentPage}&&[pagination][size]=${size}`)
-        .then((responese) => {
-          this.setState({
-            total: responese.data.pagination.total,
-            data: responese.data.trades,
-            isLoading: false,
-          });
-          localStorage.setItem('withdrawState', JSON.stringify(this.state));
-        }).catch((err) => {
-          this.setState({ isLoading: false });
-          window.console.error(err);
-        });
-    } else {
-      axios.all([
-        axios.get(`${serverUrl}/withdraws.json?filter[uuid]=${searchString}&&${newUrl}${dateRange}`),
-        axios.get(`${serverUrl}/withdraws.json?filter[amount]=${searchString}&&${newUrl}${dateRange}`),
-        axios.get(`${serverUrl}/withdraws.json?filter[bankReferenceNumber]=${searchString}&&${newUrl}${dateRange}`),
-      ]).then(axios.spread((uuidRes, volumeRes, priceRes) => {
-        const searchResult = uuidRes.data.trades
-          .concat(priceRes.data.trades)
-          .concat(volumeRes.data.trades);
-        this.setState({
-          total: uuidRes.data.pagination.total
-          + volumeRes.data.pagination.total
-          + priceRes.data.pagination.total,
-          data: searchResult,
-          isLoading: false,
-        });
-        localStorage.setItem('withdrawState', JSON.stringify(this.state));
-      })).catch((err) => {
-        this.setState({ isLoading: false });
-        window.console.error(err);
-      });
-    }
   }
 
   handleCreateTable(data) {
@@ -315,19 +292,75 @@ class WithDrawTable extends React.Component {
     return table;
   }
 
+  handleTableUpdate() {
+    const {
+      searchString,
+      dateUrl,
+      currentPage,
+      size,
+    } = this.state;
+
+    this.setState({ isLoading: true });
+    const filterUrl = this.getFilterUrl();
+
+    if (searchString === '') {
+      axios.get(`${serverUrl}/withdraws.json?${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`)
+        .then((responese) => {
+          this.setState({
+            total: responese.data.pagination.total,
+            data: responese.data.trades,
+            isLoading: false,
+            isReset: false,
+          });
+          localStorage.setItem('withdrawState', JSON.stringify(this.state));
+        }).catch((err) => {
+          this.setState({
+            isLoading: false,
+            isReset: false,
+          });
+          window.console.error(err);
+        });
+    } else {
+      axios.all([
+        axios.get(`${serverUrl}/withdraws.json?filter[uuid]=${searchString}&&${filterUrl}${dateUrl}`),
+        axios.get(`${serverUrl}/withdraws.json?filter[amount]=${searchString}&&${filterUrl}${dateUrl}`),
+        axios.get(`${serverUrl}/withdraws.json?filter[bankReferenceNumber]=${searchString}&&${filterUrl}${dateUrl}`),
+      ]).then(axios.spread((uuidRes, volumeRes, priceRes) => {
+        const searchResult = uuidRes.data.trades
+          .concat(priceRes.data.trades)
+          .concat(volumeRes.data.trades);
+        this.setState({
+          total: uuidRes.data.pagination.total
+          + volumeRes.data.pagination.total
+          + priceRes.data.pagination.total,
+          data: searchResult,
+          isLoading: false,
+          isReset: false,
+        });
+        localStorage.setItem('withdrawState', JSON.stringify(this.state));
+      })).catch((err) => {
+        this.setState({
+          isLoading: false,
+          isReset: false,
+        });
+        window.console.error(err);
+      });
+    }
+  }
+
   handleReset() {
     this.setState({
+      isReset: true,
       selectedFromDate: new Date('2010-10-10T10:10:10').toString(),
       selectedToDate: new Date().toString(),
       searchString: '',
       filterString: [],
       selectedFilter: [],
-      dateRange: '',
+      dateUrl: '',
       currentPage: 1,
       offset: 0,
       size: 5,
-    });
-    this.handleTableUpdate();
+    }, () => this.handleTableUpdate());
   }
 
   render() {
@@ -340,8 +373,6 @@ class WithDrawTable extends React.Component {
       selectedToDate,
       searchString,
       filterString,
-      side,
-      symbol,
       filterItem,
       selectedFilter,
       isLoading,
@@ -352,71 +383,74 @@ class WithDrawTable extends React.Component {
     const emptyRows = size - data.length;
 
     return (
-      <Paper className={classes.root}>
-        <WithDrawTableToolbar
-          handleFromDateChange={this.handleFromDateChange}
-          handleToDateChange={this.handleToDateChange}
-          handleSearchChange={this.handleSearchChange}
-          handleFilterChange={this.handleFilterChange}
-          selectedFromDate={selectedFromDate}
-          selectedToDate={selectedToDate}
-          searchString={searchString}
-          filterString={filterString}
-          side={side}
-          symbol={symbol}
-          filterItem={filterItem}
-          selectedFilter={selectedFilter}
-          handleReset={this.handleReset}
-        />
-        <div className={classes.tableWrapper}>
-          <Table className={classes.table} aria-labelledby="tableTitle">
-            <WithDrawTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={this.handleRequestSort}
-              rowCount={data.length}
-            />
-            <TableBody>
-              {this.handleCreateTable(data)}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 48 * emptyRows }}>
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <div className={classes.pagination}>
-          <div className={classes.formControl}>
-            <Typography variant="caption" align="center" color="textPrimary" className={classes.label}>
-              Rows per page:
-            </Typography>
-            <Select
-              className={classes.sizeSelect}
-              value={size}
-              onChange={e => this.handleChangeRowsPerPage(e)}
-            >
-              {
-                rowsPerPage.map(item => (
-                  <MenuItem key={item} value={item}>
-                    {item}
-                  </MenuItem>
-                ))
-              }
-            </Select>
-          </div>
-          <Pagination
-            limit={size}
-            offset={offset}
-            total={total}
-            onClick={
-              (event, _offset, _currentPage) => this.handlePageClick(event, _offset, _currentPage)
-            }
-            id="pagination"
+      <Container name="Withdraws">
+        <Paper className={classes.root}>
+          <CustomTableToolbar
+            title="WithDraws"
+            searchPlaceHolder="Uuid, Amount, Bank reference number"
+            searchString={searchString}
+            handleFromDateChange={this.handleFromDateChange}
+            handleToDateChange={this.handleToDateChange}
+            handleSearchChange={this.handleSearchChange}
+            handleFilterChange={this.handleFilterChange}
+            handleReset={this.handleReset}
+            selectedFromDate={selectedFromDate}
+            selectedToDate={selectedToDate}
+            filterString={filterString}
+            filterItem={filterItem}
+            selectedFilter={selectedFilter}
           />
-        </div>
-        { isLoading ? (<LinearProgress color="secondary" />) : null }
-      </Paper>
+          <div className={classes.tableWrapper}>
+            <Table className={classes.table} aria-labelledby="tableTitle">
+              <CustomTableHead
+                rows={rows}
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={this.handleRequestSort}
+                rowCount={data.length}
+              />
+              <TableBody>
+                {this.handleCreateTable(data)}
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 48 * emptyRows }}>
+                    <TableCell colSpan={6} />
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className={classes.pagination}>
+            <div className={classes.formControl}>
+              <Typography variant="caption" align="center" color="textPrimary" className={classes.label}>
+                Rows per page:
+              </Typography>
+              <Select
+                className={classes.sizeSelect}
+                value={size}
+                onChange={e => this.handleChangeRowsPerPage(e)}
+              >
+                {
+                  rowsPerPage.map(item => (
+                    <MenuItem key={item} value={item}>
+                      {item}
+                    </MenuItem>
+                  ))
+                }
+              </Select>
+            </div>
+            <Pagination
+              limit={size}
+              offset={offset}
+              total={total}
+              onClick={
+                (event, _offset, _currentPage) => this.handlePageClick(event, _offset, _currentPage)
+              }
+              id="pagination"
+            />
+          </div>
+          { isLoading ? (<LinearProgress color="secondary" />) : null }
+        </Paper>
+      </Container>
     );
   }
 }

@@ -6,29 +6,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Tooltip from '@material-ui/core/Tooltip';
 
-
-const rows = [
-  {
-    id: 'uuid', numeric: false, disablePadding: true, label: 'Uuid',
-  },
-  {
-    id: 'updatedAt', numeric: true, disablePadding: false, label: 'Updated at',
-  },
-  {
-    id: 'side', numeric: true, disablePadding: false, label: 'Side',
-  },
-  {
-    id: 'volume', numeric: true, disablePadding: false, label: 'Volume',
-  },
-  {
-    id: 'price', numeric: true, disablePadding: false, label: 'Price',
-  },
-  {
-    id: 'tradingPairSymbol', numeric: true, disablePadding: false, label: 'Trading Pair Symbol',
-  },
-];
-
-class TradeTableHead extends React.Component {
+class CustomTableHead extends React.Component {
   createSortHandler = property => (event) => {
     const { onRequestSort } = this.props;
     onRequestSort(event, property);
@@ -36,7 +14,7 @@ class TradeTableHead extends React.Component {
 
   render() {
     const {
-      order, orderBy,
+      order, orderBy, rows,
     } = this.props;
 
     return (
@@ -74,10 +52,11 @@ class TradeTableHead extends React.Component {
   }
 }
 
-TradeTableHead.propTypes = {
+CustomTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
   order: PropTypes.string.isRequired,
   orderBy: PropTypes.string.isRequired,
+  rows: PropTypes.instanceOf(Array).isRequired,
 };
 
-export default TradeTableHead;
+export default CustomTableHead;

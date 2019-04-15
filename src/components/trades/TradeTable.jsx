@@ -14,8 +14,9 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Typography from '@material-ui/core/Typography';
 import serverUrl from '../api/server';
-import TradeTableHead from './TradeTableHead';
-import TradeTableToolbar from './TradeTableToolbar';
+import CustomTableHead from '../tableComponents/CustomTableHead';
+import CustomTableToolbar from '../tableComponents/CustomTableToolbar';
+import Container from '../../container/Container';
 
 export function desc(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -41,6 +42,27 @@ export function stableSort(array, cmp) {
 export function getSorting(order, orderBy) {
   return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
 }
+
+const tableRows = [
+  {
+    id: 'uuid', numeric: false, disablePadding: true, label: 'Uuid',
+  },
+  {
+    id: 'updatedAt', numeric: true, disablePadding: false, label: 'Updated at',
+  },
+  {
+    id: 'side', numeric: true, disablePadding: false, label: 'Side',
+  },
+  {
+    id: 'volume', numeric: true, disablePadding: false, label: 'Volume',
+  },
+  {
+    id: 'price', numeric: true, disablePadding: false, label: 'Price',
+  },
+  {
+    id: 'tradingPairSymbol', numeric: true, disablePadding: false, label: 'Trading Pair Symbol',
+  },
+];
 
 const styles = theme => ({
   root: {
@@ -109,8 +131,9 @@ class TradeTable extends React.Component {
         'ETH/BTC': 'symbol',
       },
       selectedFilter: [],
-      dateRange: '',
+      dateUrl: '',
       isLoading: true,
+      isReset: false,
     };
 
     const localState = localStorage.getItem('tradeState');
@@ -129,6 +152,7 @@ class TradeTable extends React.Component {
     this.handleTableUpdate = this.handleTableUpdate.bind(this);
     this.handleReset = this.handleReset.bind(this);
     this.handleCreateTable = this.handleCreateTable.bind(this);
+    this.getFilterUrl = this.getFilterUrl.bind(this);
   }
 
   componentDidMount() {
@@ -138,33 +162,48 @@ class TradeTable extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     const {
       searchString,
-      filterString,
       selectedFromDate,
       selectedToDate,
       selectedFilter,
       currentPage,
       size,
+      isReset,
     } = this.state;
 
-    if (searchString !== prevState.searchString) {
-      this.handleTableUpdate();
+    if (isReset !== true) {
+      if (searchString !== prevState.searchString) {
+        this.handleTableUpdate();
+      }
+      if (selectedFilter !== prevState.selectedFilter) {
+        this.handleTableUpdate();
+      }
+      if (selectedFromDate !== prevState.selectedFromDate
+        || selectedToDate !== prevState.selectedToDate
+      ) {
+        this.handleTableUpdate();
+      }
+      if (currentPage !== prevState.currentPage) {
+        this.handleTableUpdate();
+      }
+      if (size !== prevState.size) {
+        this.handleTableUpdate();
+      }
     }
-    if (selectedFilter !== prevState.selectedFilter) {
-      this.handleTableUpdate();
+  }
+
+  getFilterUrl() {
+    const { filterString } = this.state;
+    let filterUrl = '';
+    if (filterString.length !== 0) {
+      filterString.forEach((item, i) => {
+        if (i === 0) {
+          filterUrl += `${item}`;
+        } else {
+          filterUrl += `&&${item}`;
+        }
+      });
     }
-    if (selectedFromDate !== prevState.selectedFromDate
-      || selectedToDate !== prevState.selectedToDate) {
-      this.handleTableUpdate();
-    }
-    if (filterString !== prevState.filterString) {
-      this.handleTableUpdate();
-    }
-    if (currentPage !== prevState.currentPage) {
-      this.handleTableUpdate();
-    }
-    if (size !== prevState.size) {
-      this.handleTableUpdate();
-    }
+    return filterUrl;
   }
 
   handlePageClick(event, _offset, _currentPage) {
@@ -201,7 +240,7 @@ class TradeTable extends React.Component {
 
     this.setState({
       selectedFromDate: date.toString(),
-      dateRange: `filter[updatedAt][gte]=${format(date, 'yyyy-MM-dd')}&&filter[updatedAt][lte]=${format(new Date(selectedToDate), 'yyyy-MM-dd')}`,
+      dateUrl: `filter[updatedAt][gte]=${format(date, 'yyyy-MM-dd')}&&filter[updatedAt][lte]=${format(new Date(selectedToDate), 'yyyy-MM-dd')}&&`,
     });
   }
 
@@ -210,7 +249,7 @@ class TradeTable extends React.Component {
 
     this.setState({
       selectedToDate: date.toString(),
-      dateRange: `filter[updatedAt][gte]=${format(new Date(selectedFromDate), 'yyyy-MM-dd')}&&filter[updatedAt][lte]=${format(date, 'yyyy-MM-dd')}`,
+      dateUrl: `filter[updatedAt][gte]=${format(new Date(selectedFromDate), 'yyyy-MM-dd')}&&filter[updatedAt][lte]=${format(date, 'yyyy-MM-dd')}&&`,
     });
   }
 
@@ -277,40 +316,36 @@ class TradeTable extends React.Component {
   handleTableUpdate() {
     const {
       searchString,
-      dateRange,
-      filterString,
+      dateUrl,
       currentPage,
       size,
     } = this.state;
-    this.setState({ isLoading: true });
-    let newUrl = '';
 
-    filterString.forEach((item, i) => {
-      if (i === 0) {
-        newUrl += `${item}`;
-      } else {
-        newUrl += `&&${item}`;
-      }
-    });
+    this.setState({ isLoading: true });
+    const filterUrl = this.getFilterUrl();
 
     if (searchString === '') {
-      axios.get(`${serverUrl}/trades.json?${newUrl}${dateRange}&&[pagination][number]=${currentPage}&&[pagination][size]=${size}`)
+      axios.get(`${serverUrl}/trades.json?${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`)
         .then((responese) => {
           this.setState({
             total: responese.data.pagination.total,
             data: responese.data.trades,
             isLoading: false,
+            isReset: false,
           });
           localStorage.setItem('tradeState', JSON.stringify(this.state));
         }).catch((err) => {
-          this.setState({ isLoading: false });
+          this.setState({
+            isLoading: false,
+            isReset: false,
+          });
           window.console.error(err);
         });
     } else {
       axios.all([
-        axios.get(`${serverUrl}/trades.json?filter[uuid]=${searchString}&&${newUrl}${dateRange}`),
-        axios.get(`${serverUrl}/trades.json?filter[volume]=${searchString}&&${newUrl}${dateRange}`),
-        axios.get(`${serverUrl}/trades.json?filter[price]=${searchString}&&${newUrl}${dateRange}`),
+        axios.get(`${serverUrl}/trades.json?filter[uuid]=${searchString}&&${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`),
+        axios.get(`${serverUrl}/trades.json?filter[volume]=${searchString}&&${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`),
+        axios.get(`${serverUrl}/trades.json?filter[price]=${searchString}&&${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`),
       ]).then(axios.spread((uuidRes, volumeRes, priceRes) => {
         const searchResult = uuidRes.data.trades
           .concat(priceRes.data.trades)
@@ -321,10 +356,14 @@ class TradeTable extends React.Component {
           + priceRes.data.pagination.total,
           data: searchResult,
           isLoading: false,
+          isReset: false,
         });
         localStorage.setItem('tradeState', JSON.stringify(this.state));
       })).catch((err) => {
-        this.setState({ isLoading: false });
+        this.setState({
+          isLoading: false,
+          isReset: false,
+        });
         window.console.error(err);
       });
     }
@@ -332,17 +371,17 @@ class TradeTable extends React.Component {
 
   handleReset() {
     this.setState({
+      isReset: true,
       selectedFromDate: new Date('2010-10-10T10:10:10').toString(),
       selectedToDate: new Date().toString(),
       searchString: '',
       filterString: [],
       selectedFilter: [],
-      dateRange: '',
+      dateUrl: '',
       currentPage: 1,
       offset: 0,
       size: 5,
-    });
-    this.handleTableUpdate();
+    }, () => this.handleTableUpdate());
   }
 
   render() {
@@ -355,8 +394,6 @@ class TradeTable extends React.Component {
       selectedToDate,
       searchString,
       filterString,
-      side,
-      symbol,
       filterItem,
       selectedFilter,
       isLoading,
@@ -367,74 +404,77 @@ class TradeTable extends React.Component {
     const emptyRows = size - data.length;
 
     return (
-      <Paper className={classes.root}>
-        <TradeTableToolbar
-          handleFromDateChange={this.handleFromDateChange}
-          handleToDateChange={this.handleToDateChange}
-          handleSearchChange={this.handleSearchChange}
-          handleFilterChange={this.handleFilterChange}
-          handleReset={this.handleReset}
-          selectedFromDate={selectedFromDate}
-          selectedToDate={selectedToDate}
-          searchString={searchString}
-          filterString={filterString}
-          side={side}
-          symbol={symbol}
-          filterItem={filterItem}
-          selectedFilter={selectedFilter}
-        />
-        <div className={classes.tableWrapper}>
-          <Table className={classes.table} aria-labelledby="tableTitle">
-            <TradeTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={this.handleRequestSort}
-              rowCount={data.length}
-            />
-            <TableBody>
-              {this.handleCreateTable(data)}
-
-              {
-                emptyRows > 0 && (
-                  <TableRow style={{ height: 48 * emptyRows }}>
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )
-              }
-            </TableBody>
-          </Table>
-        </div>
-        <div className={classes.pagination}>
-          <div className={classes.formControl}>
-            <Typography variant="caption" align="center" color="textPrimary" className={classes.label}>
-              Rows per page:
-            </Typography>
-            <Select
-              className={classes.sizeSelect}
-              value={size}
-              onChange={e => this.handleChangeRowsPerPage(e)}
-            >
-              {
-                rowsPerPage.map(item => (
-                  <MenuItem key={item} value={item}>
-                    {item}
-                  </MenuItem>
-                ))
-              }
-            </Select>
-          </div>
-          <Pagination
-            limit={size}
-            offset={offset}
-            total={total}
-            onClick={
-              (event, _offset, _currentPage) => this.handlePageClick(event, _offset, _currentPage)
-            }
-            id="pagination"
+      <Container name="Trades">
+        <Paper className={classes.root}>
+          <CustomTableToolbar
+            title="Trades"
+            searchPlaceHolder="Uuid, Volume, Price"
+            searchString={searchString}
+            handleFromDateChange={this.handleFromDateChange}
+            handleToDateChange={this.handleToDateChange}
+            handleSearchChange={this.handleSearchChange}
+            handleFilterChange={this.handleFilterChange}
+            handleReset={this.handleReset}
+            selectedFromDate={selectedFromDate}
+            selectedToDate={selectedToDate}
+            filterString={filterString}
+            filterItem={filterItem}
+            selectedFilter={selectedFilter}
           />
-        </div>
-        { isLoading ? (<LinearProgress color="secondary" />) : null }
-      </Paper>
+          <div className={classes.tableWrapper}>
+            <Table className={classes.table} aria-labelledby="tableTitle">
+              <CustomTableHead
+                rows={tableRows}
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={this.handleRequestSort}
+                rowCount={data.length}
+              />
+              <TableBody>
+                {this.handleCreateTable(data)}
+
+                {
+                  emptyRows > 0 && (
+                    <TableRow style={{ height: 48 * emptyRows }}>
+                      <TableCell colSpan={6} />
+                    </TableRow>
+                  )
+                }
+              </TableBody>
+            </Table>
+          </div>
+          <div className={classes.pagination}>
+            <div className={classes.formControl}>
+              <Typography variant="caption" align="center" color="textPrimary" className={classes.label}>
+                Rows per page:
+              </Typography>
+              <Select
+                className={classes.sizeSelect}
+                value={size}
+                onChange={e => this.handleChangeRowsPerPage(e)}
+              >
+                {
+                  rowsPerPage.map(item => (
+                    <MenuItem key={item} value={item}>
+                      {item}
+                    </MenuItem>
+                  ))
+                }
+              </Select>
+            </div>
+            <Pagination
+              limit={size}
+              offset={offset}
+              total={total}
+              onClick={
+                (event, _offset, _currentPage) => this.handlePageClick(event, _offset, _currentPage)
+              }
+              id="pagination"
+            />
+          </div>
+          { isLoading ? (<LinearProgress color="secondary" />) : null }
+        </Paper>
+      </Container>
     );
   }
 }

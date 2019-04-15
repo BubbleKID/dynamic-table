@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Select from '@material-ui/core/Select';
 import TableRow from '@material-ui/core/TableRow';
 import MockAdapter from 'axios-mock-adapter';
@@ -9,12 +8,6 @@ import { createShallow } from '@material-ui/core/test-utils';
 import WithDrawTable, { desc, stableSort, getSorting } from '../../../../src/components/withdraws/WithDrawTable';
 
 describe('Test WithDrawTable', () => {
-  it('renders without crashing', () => {
-    const div = document.createElement('div');
-    ReactDOM.render(<WithDrawTable />, div);
-    ReactDOM.unmountComponentAtNode(div);
-  });
-
   describe('desc() function', () => {
     describe('given three values', () => {
       it('it should get compare result 1, -1 or 0', () => {
@@ -183,7 +176,7 @@ describe('handleTableUpdate() is called', () => {
       const spyHandleTableUpdate = jest.spyOn(wrapper.instance(), 'handleTableUpdate');
       const mock = new MockAdapter(axios);
       mock
-        .onGet('https://dynamic-server.herokuapp.com/withdraws.json?&&[pagination][number]=1&&[pagination][size]=5')
+        .onGet('https://dynamic-server.herokuapp.com/withdraws.json?[pagination][number]=1&&[pagination][size]=5')
         .reply(200, mockData);
       await wrapper.instance().handleTableUpdate();
       expect(spyHandleTableUpdate).toHaveBeenCalled();
