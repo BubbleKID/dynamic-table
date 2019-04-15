@@ -122,7 +122,7 @@ class TradeTable extends React.Component {
       selectedFromDate: new Date('2010-10-10T10:10:10').toString(),
       selectedToDate: new Date().toString(),
       searchString: '',
-      filterString: [],
+      filterUrl: '',
       filterItem: {
         ASK: 'side',
         BID: 'side',
@@ -152,7 +152,6 @@ class TradeTable extends React.Component {
     this.handleTableUpdate = this.handleTableUpdate.bind(this);
     this.handleReset = this.handleReset.bind(this);
     this.handleCreateTable = this.handleCreateTable.bind(this);
-    this.getFilterUrl = this.getFilterUrl.bind(this);
   }
 
   componentDidMount() {
@@ -169,6 +168,7 @@ class TradeTable extends React.Component {
       size,
       isReset,
     } = this.state;
+
 
     if (isReset !== true) {
       if (searchString !== prevState.searchString) {
@@ -189,21 +189,6 @@ class TradeTable extends React.Component {
         this.handleTableUpdate();
       }
     }
-  }
-
-  getFilterUrl() {
-    const { filterString } = this.state;
-    let filterUrl = '';
-    if (filterString.length !== 0) {
-      filterString.forEach((item, i) => {
-        if (i === 0) {
-          filterUrl += `${item}`;
-        } else {
-          filterUrl += `&&${item}`;
-        }
-      });
-    }
-    return filterUrl;
   }
 
   handlePageClick(event, _offset, _currentPage) {
@@ -230,8 +215,12 @@ class TradeTable extends React.Component {
   }
 
   handleChangeRowsPerPage(event) {
+    const { offset } = this.state;
     this.setState({
       size: event.target.value,
+      currentPage: offset !== 0 ? Math.ceil(offset / event.target.value) : 1,
+      // Update pagination (offset, currentPage) manually
+      // if 'Rows per page' , 'Filter' etc changes
     });
   }
 
@@ -255,19 +244,20 @@ class TradeTable extends React.Component {
 
   handleFilterChange(event) {
     const { filterItem } = this.state;
-    const newFilterString = event.target.value.map((item) => {
-      let val = '';
+
+    let tempUrl = '';
+    event.target.value.forEach((item) => {
       if ((filterItem[item]) === 'side') {
-        val = `filter[side]=${item}`;
+        tempUrl += `filter[side]=${item}&&`;
       }
       if ((filterItem[item]) === 'symbol') {
-        val = `filter[tradingPair][symbol][inq]=${item}`;
+        tempUrl += `filter[tradingPair][symbol][inq]=${item}&&`;
       }
-      return val;
     });
+
     this.setState({
       selectedFilter: event.target.value,
-      filterString: newFilterString,
+      filterUrl: tempUrl,
     });
   }
 
@@ -319,17 +309,23 @@ class TradeTable extends React.Component {
       dateUrl,
       currentPage,
       size,
+      offset,
+      filterUrl,
     } = this.state;
 
     this.setState({ isLoading: true });
-    const filterUrl = this.getFilterUrl();
-
     if (searchString === '') {
       axios.get(`${serverUrl}/trades.json?${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`)
         .then((responese) => {
+          const currentTotal = responese.data.pagination.total;
+
           this.setState({
-            total: responese.data.pagination.total,
+            total: currentTotal,
             data: responese.data.trades,
+            offset: offset > currentTotal ? 0 : offset,
+            currentPage: currentPage > Math.ceil(currentTotal / size) ? 1 : currentPage,
+            // Update pagination (offset, currentPage) manually
+            // if 'Rows per page' , 'Filter' etc changes
             isLoading: false,
             isReset: false,
           });
@@ -350,10 +346,16 @@ class TradeTable extends React.Component {
         const searchResult = uuidRes.data.trades
           .concat(priceRes.data.trades)
           .concat(volumeRes.data.trades);
+        const currentTotal = uuidRes.data.pagination.total
+        + volumeRes.data.pagination.total
+        + priceRes.data.pagination.total;
+
         this.setState({
-          total: uuidRes.data.pagination.total
-          + volumeRes.data.pagination.total
-          + priceRes.data.pagination.total,
+          total: currentTotal,
+          offset: offset > currentTotal ? 0 : offset,
+          currentPage: currentPage > Math.ceil(currentTotal / size) ? 1 : currentPage,
+          // Update pagination (offset, currentPage) manually
+          // if 'Rows per page' , 'Filter' etc changes
           data: searchResult,
           isLoading: false,
           isReset: false,
@@ -375,7 +377,7 @@ class TradeTable extends React.Component {
       selectedFromDate: new Date('2010-10-10T10:10:10').toString(),
       selectedToDate: new Date().toString(),
       searchString: '',
-      filterString: [],
+      filterUrl: '',
       selectedFilter: [],
       dateUrl: '',
       currentPage: 1,
@@ -393,7 +395,6 @@ class TradeTable extends React.Component {
       selectedFromDate,
       selectedToDate,
       searchString,
-      filterString,
       filterItem,
       selectedFilter,
       isLoading,
@@ -417,7 +418,6 @@ class TradeTable extends React.Component {
             handleReset={this.handleReset}
             selectedFromDate={selectedFromDate}
             selectedToDate={selectedToDate}
-            filterString={filterString}
             filterItem={filterItem}
             selectedFilter={selectedFilter}
           />

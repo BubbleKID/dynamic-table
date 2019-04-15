@@ -30,6 +30,7 @@ export function desc(a, b, orderBy) {
 
 export function stableSort(array, cmp) {
   const stabilizedThis = array.map((el, index) => [el, index]);
+
   stabilizedThis.sort((a, b) => {
     const order = cmp(a[0], b[0]);
     if (order !== 0) return order;
@@ -42,6 +43,23 @@ export function getSorting(order, orderBy) {
   return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
 }
 
+const rows = [
+  {
+    id: 'uuid', numeric: false, disablePadding: true, label: 'Uuid',
+  },
+  {
+    id: 'createdAt', numeric: true, disablePadding: false, label: 'Created at',
+  },
+  {
+    id: 'status', numeric: true, disablePadding: false, label: 'Status',
+  },
+  {
+    id: 'amount', numeric: true, disablePadding: false, label: 'Amount',
+  },
+  {
+    id: 'bankReferenceNumber', numeric: true, disablePadding: false, label: 'Bank Reference Number',
+  },
+];
 const styles = theme => ({
   root: {
     width: '100%',
@@ -85,23 +103,6 @@ const styles = theme => ({
   },
 });
 const rowsPerPage = [5, 10, 15, 20];
-const rows = [
-  {
-    id: 'uuid', numeric: false, disablePadding: true, label: 'Uuid',
-  },
-  {
-    id: 'createdAt', numeric: true, disablePadding: false, label: 'Created at',
-  },
-  {
-    id: 'status', numeric: true, disablePadding: false, label: 'Status',
-  },
-  {
-    id: 'amount', numeric: true, disablePadding: false, label: 'Amount',
-  },
-  {
-    id: 'bankReferenceNumber', numeric: true, disablePadding: false, label: 'Bank Reference Number',
-  },
-];
 
 class WithDrawTable extends React.Component {
   constructor(props) {
@@ -117,7 +118,7 @@ class WithDrawTable extends React.Component {
       selectedFromDate: new Date('2010-10-10T10:10:10').toString(),
       selectedToDate: new Date().toString(),
       searchString: '',
-      filterString: [],
+      filterUrl: '',
       filterItem: {
         PROCESSED: 'status',
         REJECTED: 'status',
@@ -144,7 +145,6 @@ class WithDrawTable extends React.Component {
     this.handleTableUpdate = this.handleTableUpdate.bind(this);
     this.handleReset = this.handleReset.bind(this);
     this.handleCreateTable = this.handleCreateTable.bind(this);
-    this.getFilterUrl = this.getFilterUrl.bind(this);
   }
 
   componentDidMount() {
@@ -170,7 +170,8 @@ class WithDrawTable extends React.Component {
         this.handleTableUpdate();
       }
       if (selectedFromDate !== prevState.selectedFromDate
-        || selectedToDate !== prevState.selectedToDate) {
+        || selectedToDate !== prevState.selectedToDate
+      ) {
         this.handleTableUpdate();
       }
       if (currentPage !== prevState.currentPage) {
@@ -180,20 +181,6 @@ class WithDrawTable extends React.Component {
         this.handleTableUpdate();
       }
     }
-  }
-
-  getFilterUrl() {
-    const { filterString } = this.state;
-    let filterUrl = '';
-
-    filterString.forEach((item, i) => {
-      if (i === 0) {
-        filterUrl += `${item}`;
-      } else {
-        filterUrl += `&&${item}`;
-      }
-    });
-    return filterUrl;
   }
 
   handlePageClick(event, _offset, _currentPage) {
@@ -220,8 +207,12 @@ class WithDrawTable extends React.Component {
   }
 
   handleChangeRowsPerPage(event) {
+    const { offset } = this.state;
     this.setState({
       size: event.target.value,
+      currentPage: offset !== 0 ? Math.ceil(offset / event.target.value) : 1,
+      // Update pagination (offset, currentPage) manually
+      // if 'Rows per page' , 'Filter' etc changes
     });
   }
 
@@ -244,10 +235,14 @@ class WithDrawTable extends React.Component {
   }
 
   handleFilterChange(event) {
-    const newFilterString = event.target.value.map(item => (`filter[status]=${item.toUpperCase()}`));
+    let tempUrl = '';
+
+    event.target.value.forEach((item) => {
+      tempUrl += `filter[status]=${item}&&`;
+    });
     this.setState({
       selectedFilter: event.target.value,
-      filterString: newFilterString,
+      filterUrl: tempUrl,
     });
   }
 
@@ -298,17 +293,23 @@ class WithDrawTable extends React.Component {
       dateUrl,
       currentPage,
       size,
+      offset,
+      filterUrl,
     } = this.state;
 
     this.setState({ isLoading: true });
-    const filterUrl = this.getFilterUrl();
 
     if (searchString === '') {
       axios.get(`${serverUrl}/withdraws.json?${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`)
         .then((responese) => {
+          const currentTotal = responese.data.pagination.total;
           this.setState({
-            total: responese.data.pagination.total,
+            total: currentTotal,
             data: responese.data.trades,
+            offset: offset > currentTotal ? 0 : offset,
+            currentPage: currentPage > Math.ceil(currentTotal / size) ? 1 : currentPage,
+            // Update pagination (offset, currentPage) manually
+            // if 'Rows per page' , 'Filter' etc changes
             isLoading: false,
             isReset: false,
           });
@@ -322,17 +323,23 @@ class WithDrawTable extends React.Component {
         });
     } else {
       axios.all([
-        axios.get(`${serverUrl}/withdraws.json?filter[uuid]=${searchString}&&${filterUrl}${dateUrl}`),
-        axios.get(`${serverUrl}/withdraws.json?filter[amount]=${searchString}&&${filterUrl}${dateUrl}`),
-        axios.get(`${serverUrl}/withdraws.json?filter[bankReferenceNumber]=${searchString}&&${filterUrl}${dateUrl}`),
+        axios.get(`${serverUrl}/withdraws.json?filter[uuid]=${searchString}&&${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`),
+        axios.get(`${serverUrl}/withdraws.json?filter[amount]=${searchString}&&${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`),
+        axios.get(`${serverUrl}/withdraws.json?filter[bankReferenceNumber]=${searchString}&&${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`),
       ]).then(axios.spread((uuidRes, volumeRes, priceRes) => {
         const searchResult = uuidRes.data.trades
           .concat(priceRes.data.trades)
           .concat(volumeRes.data.trades);
+        const currentTotal = uuidRes.data.pagination.total
+        + volumeRes.data.pagination.total
+        + priceRes.data.pagination.total;
+
         this.setState({
-          total: uuidRes.data.pagination.total
-          + volumeRes.data.pagination.total
-          + priceRes.data.pagination.total,
+          total: currentTotal,
+          offset: offset > currentTotal ? 0 : offset,
+          currentPage: currentPage > Math.ceil(currentTotal / size) ? 1 : currentPage,
+          // Update pagination (offset, currentPage) manually
+          // if 'Rows per page' , 'Filter' etc changes
           data: searchResult,
           isLoading: false,
           isReset: false,
@@ -354,7 +361,7 @@ class WithDrawTable extends React.Component {
       selectedFromDate: new Date('2010-10-10T10:10:10').toString(),
       selectedToDate: new Date().toString(),
       searchString: '',
-      filterString: [],
+      filterUrl: '',
       selectedFilter: [],
       dateUrl: '',
       currentPage: 1,
@@ -372,7 +379,6 @@ class WithDrawTable extends React.Component {
       selectedFromDate,
       selectedToDate,
       searchString,
-      filterString,
       filterItem,
       selectedFilter,
       isLoading,
@@ -396,7 +402,6 @@ class WithDrawTable extends React.Component {
             handleReset={this.handleReset}
             selectedFromDate={selectedFromDate}
             selectedToDate={selectedToDate}
-            filterString={filterString}
             filterItem={filterItem}
             selectedFilter={selectedFilter}
           />
@@ -411,11 +416,13 @@ class WithDrawTable extends React.Component {
               />
               <TableBody>
                 {this.handleCreateTable(data)}
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 48 * emptyRows }}>
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
+                {
+                  emptyRows > 0 && (
+                    <TableRow style={{ height: 48 * emptyRows }}>
+                      <TableCell colSpan={6} />
+                    </TableRow>
+                  )
+                }
               </TableBody>
             </Table>
           </div>

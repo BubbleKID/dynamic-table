@@ -11,7 +11,7 @@
     "build": "webpack --mode production",
     "heroku-postbuild": "webpack -p"
   },
-  "author": "",
+  "author": "Xin Chen",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.4.0",
