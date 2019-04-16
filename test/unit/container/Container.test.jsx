@@ -1,9 +1,6 @@
 import React from 'react';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 import { mount } from 'enzyme';
-import Container from '../../../src/container/Container';
-import WithDrawTable from '../../../src/components/withdraws/WithDrawTable';
-import TradeTable from '../../../src/components/trades/TradeTable';
 import App from '../../../src/App';
 
 describe('Test Container', () => {
@@ -12,7 +9,7 @@ describe('Test Container', () => {
     wrapper = mount(
       <MemoryRouter initialEntries={['/', '/trades', 'withdraws']} initialIndex={1}>
         <App />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
   });
 

@@ -1,13 +1,16 @@
 # Dynamic Table
 [![Build Status](https://api.travis-ci.org/BubbleKID/dynamic-table.png)](https://travis-ci.org/BubbleKID/dynamic-table/)
 [![Coverage Status](https://coveralls.io/repos/github/BubbleKID/dynamic-table/badge.svg?branch=master)](https://coveralls.io/github/BubbleKID/dynamic-table?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e98175effb564be1899dc61a4bc4f63e)](https://www.codacy.com/app/BubbleKID/dynamic-table?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=BubbleKID/dynamic-table&amp;utm_campaign=Badge_Grade)
 
 Screentshot
 
 ![screenshot](screenshot.png)
 
 ## Demo
-https://dynamic-table-new.herokuapp.com/
+
+<https://dynamic-table-new.herokuapp.com/>
+
 ## Installation
 
 NPM:
