@@ -28,7 +28,7 @@ it('handle changing an sort label', () => {
   ];
   const wrapper = mount(
     <Table>
-      <CustomTableHead onRequestSort={mockOnRequestSort} rows={tableRows} order="desc" orderBy="uuid" />
+      <CustomTableHead onRequestSort={mockOnRequestSort} tableRows={tableRows} order="desc" orderBy="uuid" />
     </Table>,
   );
   wrapper.find(TableSortLabel).at(1).simulate('click');

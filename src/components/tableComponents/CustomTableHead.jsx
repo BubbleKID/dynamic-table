@@ -14,14 +14,14 @@ class CustomTableHead extends React.Component {
 
   render() {
     const {
-      order, orderBy, rows,
+      order, orderBy, tableRows,
     } = this.props;
 
     return (
       <TableHead>
         <TableRow>
           <TableCell padding="checkbox" />
-          {rows.map(
+          {tableRows.map(
             row => (
               <TableCell
                 key={row.id}
@@ -56,7 +56,7 @@ CustomTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
   order: PropTypes.string.isRequired,
   orderBy: PropTypes.string.isRequired,
-  rows: PropTypes.instanceOf(Array).isRequired,
+  tableRows: PropTypes.instanceOf(Array).isRequired,
 };
 
 export default CustomTableHead;

@@ -5,9 +5,54 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import '../../../../src/components/api/server';
 import { createShallow } from '@material-ui/core/test-utils';
-import TradeTable, { desc, stableSort, getSorting } from '../../../../src/components/trades/TradeTable';
+import CustomTable, { desc, stableSort, getSorting } from '../../../../src/components/tableComponents/CustomTable';
+import { getFilterUrl } from '../../../../src/components/trades/TradeTable';
 
-describe('Test TradeTable', () => {
+let wrapper;
+beforeEach(() => {
+  const shallowNew = createShallow({ dive: true });
+  wrapper = shallowNew(
+    <CustomTable
+      tableRows={[
+        {
+          id: 'uuid', numeric: false, disablePadding: true, label: 'Uuid',
+        },
+        {
+          id: 'updatedAt', numeric: true, disablePadding: false, label: 'Updated at',
+        },
+        {
+          id: 'volume', numeric: true, disablePadding: false, label: 'Volume',
+        },
+        {
+          id: 'price', numeric: true, disablePadding: false, label: 'Price',
+        },
+        {
+          id: 'side', numeric: true, disablePadding: false, label: 'Side',
+        },
+        {
+          id: 'tradingPairSymbol', numeric: true, disablePadding: false, label: 'Trading Pair Symbol',
+        },
+      ]}
+      filterItem={{
+        ASK: 'side',
+        BID: 'side',
+        'BTC/AUD': 'symbol',
+        'ETH/AUD': 'symbol',
+        'ETH/BTC': 'symbol',
+      }}
+      timeString="updatedAt"
+      dbName="trades"
+      name="Trade"
+      keyword1="uuid"
+      keyword2="volume"
+      keyword3="price"
+      getFilterUrl={getFilterUrl}
+      searchPlaceHolder="Uuid, Volume, Price"
+    />,
+  );
+});
+
+describe('Test CustomTable', () => {
   describe('desc() function', () => {
     describe('given three values', () => {
       it('it should get compare result 1, -1 or 0', () => {
@@ -31,10 +76,15 @@ describe('Test TradeTable', () => {
   });
 
   describe('handleChangeRowsPerPage() is called', () => {
-    it("when RowsPerPage 'select' changes", () => {
-      const shallowNew = createShallow({ dive: true });
-      const wrapper = shallowNew(<TradeTable />);
+    it("when RowsPerPage 'select' changes offset equals 0", () => {
       const handleChangeRowsPerPage = jest.spyOn(wrapper.instance(), 'handleChangeRowsPerPage');
+      wrapper.find(Select).at(0).simulate('change', { target: { value: 5 } });
+      expect(handleChangeRowsPerPage).toHaveBeenCalled();
+    });
+
+    it("when RowsPerPage 'select' changes and offset not equal 0", () => {
+      const handleChangeRowsPerPage = jest.spyOn(wrapper.instance(), 'handleChangeRowsPerPage');
+      wrapper.setState({ offset: 10 });
       wrapper.find(Select).at(0).simulate('change', { target: { value: 5 } });
       expect(handleChangeRowsPerPage).toHaveBeenCalled();
     });
@@ -42,17 +92,13 @@ describe('Test TradeTable', () => {
 
   describe('handleTableUpdate() is called', () => {
     describe('when click the pagination is clicked', () => {
-      let wrapper;
-      let shallowNew;
       let handleTableUpdate;
 
       beforeEach(() => {
-        shallowNew = createShallow({ dive: true });
-        wrapper = shallowNew(<TradeTable />);
         handleTableUpdate = jest.spyOn(wrapper.instance(), 'handleTableUpdate');
       });
 
-      it('when searchString = "" ', () => {
+      it('when searchString = ""', () => {
         wrapper.setState({ searchString: '' });
         wrapper.find('#pagination').simulate('click');
         expect(handleTableUpdate).toHaveBeenCalled();
@@ -62,8 +108,6 @@ describe('Test TradeTable', () => {
 
   describe('handlePageClick() is called', () => {
     it('when pagination is changed', () => {
-      const shallowNew = createShallow({ dive: true });
-      const wrapper = shallowNew(<TradeTable />);
       const handlePageClick = jest.spyOn(wrapper.instance(), 'handlePageClick');
       wrapper.find('#pagination').simulate('click');
       expect(handlePageClick).toHaveBeenCalled();
@@ -71,16 +115,12 @@ describe('Test TradeTable', () => {
   });
 
   it('handleReset() works correctly', () => {
-    const shallowNew = createShallow({ dive: true });
-    const wrapper = shallowNew(<TradeTable />);
     wrapper.setState({ size: 10 });
     wrapper.instance().handleReset();
     expect(wrapper.state('size')).toEqual(5);
   });
 
   it('handleSearchChange() works correctly', () => {
-    const shallowNew = createShallow({ dive: true });
-    const wrapper = shallowNew(<TradeTable />);
     const event = { target: { value: 'good' } };
     wrapper.setState({ searchString: 'not good' });
     wrapper.instance().handleSearchChange(event);
@@ -88,8 +128,6 @@ describe('Test TradeTable', () => {
   });
 
   it('handleFromDateChange() works correctly', () => {
-    const shallowNew = createShallow({ dive: true });
-    const wrapper = shallowNew(<TradeTable />);
     wrapper.instance().handleFromDateChange(new Date('2010-10-10T10:10:10'));
     const dateString = wrapper.state('selectedFromDate');
     const convertDate = new Date(dateString).toLocaleDateString('en-US');
@@ -97,8 +135,6 @@ describe('Test TradeTable', () => {
   });
 
   it('handleToDateChange() works correctly', () => {
-    const shallowNew = createShallow({ dive: true });
-    const wrapper = shallowNew(<TradeTable />);
     wrapper.instance().handleToDateChange(new Date('2010-10-10T10:10:10'));
     const dateString = wrapper.state('selectedToDate');
     const convertDate = new Date(dateString).toLocaleDateString('en-US');
@@ -106,16 +142,12 @@ describe('Test TradeTable', () => {
   });
 
   it('handleFilterChange() works correctly', () => {
-    const shallowNew = createShallow({ dive: true });
-    const wrapper = shallowNew(<TradeTable />);
     const event = { target: { value: ['BID', 'BID/AUD', 'ETH/AUD'] } };
     wrapper.instance().handleFilterChange(event);
     expect(wrapper.state('selectedFilter')).toEqual(['BID', 'BID/AUD', 'ETH/AUD']);
   });
 
   it('handleRequestSort function works correctly', () => {
-    const shallowNew = createShallow({ dive: true });
-    const wrapper = shallowNew(<TradeTable />);
     const mockedEvent = { target: {} };
     const proptery = 'price';
     wrapper.setState({ orderBy: 'price', order: 'desc' });
@@ -128,8 +160,6 @@ describe('Test TradeTable', () => {
   });
 
   it('handleCreateTable() works correctly', () => {
-    const shallowNew = createShallow({ dive: true });
-    const wrapper = shallowNew(<TradeTable />);
     const mockData1 = [
       {
         uuid: '20e31aef-b718-46a5-a7ee-77982e093786',
@@ -154,9 +184,9 @@ describe('Test TradeTable', () => {
 
 describe('handleTableUpdate() is called', () => {
   describe('when searchString is empty', () => {
-    it('when filterString changes ', async () => {
-      const shallowNew = createShallow({ dive: true });
-      const mockData = {
+    let mockData;
+    beforeEach(() => {
+      mockData = {
         trades: [
           {
             uuid: '20e31aef-b718-46a5-a7ee-77982e093786',
@@ -176,7 +206,9 @@ describe('handleTableUpdate() is called', () => {
           total: 42,
         },
       };
-      const wrapper = shallowNew(<TradeTable />);
+    });
+
+    it('when filterString changes and offset < currentTotal (nomral)', async () => {
       wrapper.setState({
         searchString: '',
         total: 42,
@@ -190,9 +222,35 @@ describe('handleTableUpdate() is called', () => {
       expect(spyHandleTableUpdate).toHaveBeenCalled();
     });
 
+    it('when filterString changes and offset > currentTotal ', async () => {
+      wrapper.setState({
+        searchString: '',
+        total: 42,
+        offset: 50,
+      });
+      const spyHandleTableUpdate = jest.spyOn(wrapper.instance(), 'handleTableUpdate');
+      const mock = new MockAdapter(axios);
+      mock
+        .onGet('https://dynamic-server.herokuapp.com/trades.json?[pagination][number]=1&&[pagination][size]=5')
+        .reply(200, mockData);
+      await wrapper.instance().handleTableUpdate();
+      expect(spyHandleTableUpdate).toHaveBeenCalled();
+    });
+
+    it('when filterString changes and currentPage > total page ', async () => {
+      const spyHandleTableUpdate = jest.spyOn(wrapper.instance(), 'handleTableUpdate');
+      const mock = new MockAdapter(axios);
+      wrapper.setState({
+        searchString: '',
+        size: 5,
+        currentPage: 99,
+      });
+      mock.onAny().reply(200, mockData);
+      await wrapper.instance().handleTableUpdate();
+      expect(spyHandleTableUpdate).toHaveBeenCalled();
+    });
+
     it('when it cant fetch data and throw error ', async () => {
-      const shallowNew = createShallow({ dive: true });
-      const wrapper = shallowNew(<TradeTable />);
       const mock = new MockAdapter(axios);
       wrapper.setState({ searchString: '' });
       window.console.error = jest.fn();
@@ -202,10 +260,76 @@ describe('handleTableUpdate() is called', () => {
     });
   });
 
-  describe('when searchString is valid ', () => {
+  describe('when searchString is not empty ', () => {
+    it('when filterString changes and offset > total', async () => {
+      const mockData = {
+        trades: [
+          {
+            uuid: '20e31aef-b718-46a5-a7ee-77982e093786',
+            updatedAt: 1526397461000,
+            volume: '8.72005',
+            price: '4874.44',
+            side: 'ASK',
+            tradingPair: {
+              uuid: 'c5229898-0afe-4b87-87e0-de451f6c1f30',
+              symbol: 'ETH/AUD',
+            },
+          },
+        ],
+        pagination: {
+          number: 1,
+          size: 5,
+          total: 10,
+        },
+      };
+      wrapper.setState({
+        searchString: 'aaa',
+        total: 42,
+        size: 5,
+        offset: 50,
+      });
+      const spyHandleTableUpdate = jest.spyOn(wrapper.instance(), 'handleTableUpdate');
+      const mock = new MockAdapter(axios);
+      mock.onAny().reply(200, mockData);
+      await wrapper.instance().handleTableUpdate();
+      expect(spyHandleTableUpdate).toHaveBeenCalled();
+    });
+
+
+    it('when filterString changes and currentPage > total page', async () => {
+      const mockData = {
+        trades: [
+          {
+            uuid: '20e31aef-b718-46a5-a7ee-77982e093786',
+            updatedAt: 1526397461000,
+            volume: '8.72005',
+            price: '4874.44',
+            side: 'ASK',
+            tradingPair: {
+              uuid: 'c5229898-0afe-4b87-87e0-de451f6c1f30',
+              symbol: 'ETH/AUD',
+            },
+          },
+        ],
+        pagination: {
+          number: 1,
+          size: 5,
+          total: 10,
+        },
+      };
+      wrapper.setState({
+        searchString: 'aaa',
+        total: 42,
+        size: 5,
+        currentPage: 20,
+      });
+      const spyHandleTableUpdate = jest.spyOn(wrapper.instance(), 'handleTableUpdate');
+      const mock = new MockAdapter(axios);
+      mock.onAny().reply(200, mockData);
+      await wrapper.instance().handleTableUpdate();
+      expect(spyHandleTableUpdate).toHaveBeenCalled();
+    });
     it('when it cant fetch data and throw error', async () => {
-      const shallowNew = createShallow({ dive: true });
-      const wrapper = shallowNew(<TradeTable />);
       const mock = new MockAdapter(axios);
       wrapper.setState({ searchString: 'aaa' });
       window.console.error = jest.fn();
@@ -216,8 +340,6 @@ describe('handleTableUpdate() is called', () => {
     });
 
     it('handleTableUpdate() throw error when it fetches data searchString!=""', async () => {
-      const shallowNew = createShallow({ dive: true });
-      const wrapper = shallowNew(<TradeTable />);
       const mock = new MockAdapter(axios);
       const mockData = {
         trades: [
