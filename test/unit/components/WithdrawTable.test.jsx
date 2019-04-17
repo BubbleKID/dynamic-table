@@ -1,7 +1,7 @@
 import React from 'react';
 import { createShallow } from '@material-ui/core/test-utils';
-import { getFilterUrl } from '../../../../src/components/withdraws/WithdrawTable';
-import CustomTable from '../../../../src/components/tableComponents/CustomTable';
+import { getFilterUrl } from '../../../src/components/WithdrawTable';
+import CustomTable from '../../../src/components/tableComponents/CustomTable';
 
 
 it('handleFilterChange() works correctly', () => {
