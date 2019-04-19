@@ -95,7 +95,7 @@ let TradeTableToolbar = (props) => {
             label="From"
             value={new Date(selectedFromDate)}
             onChange={handleFromDateChange}
-            format="dd-MM-yyyy"
+            format="yyyy-MM-dd"
           />
         </MuiPickersUtilsProvider>
       </div>
@@ -105,7 +105,7 @@ let TradeTableToolbar = (props) => {
             label="To"
             value={new Date(selectedToDate)}
             onChange={handleToDateChange}
-            format="dd-MM-yyyy"
+            format="yyyy-MM-dd"
           />
         </MuiPickersUtilsProvider>
       </div>

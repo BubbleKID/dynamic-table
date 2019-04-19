@@ -36,7 +36,7 @@ const styles = theme => ({
   },
 });
 
-function Container(props) {
+const Container = (props) => {
   const {
     classes,
     name,
@@ -61,7 +61,6 @@ function Container(props) {
         </Toolbar>
       </AppBar>
       <main>
-        {/* Hero unit */}
         <div className={classes.heroUnit}>
           <div className={classes.heroContent}>
             <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
@@ -70,7 +69,6 @@ function Container(props) {
           </div>
         </div>
         <div className={classNames(classes.layout, classes.cardGrid)}>
-          {/* End hero unit */}
           <Grid container spacing={40}>
             {children}
           </Grid>
@@ -78,7 +76,7 @@ function Container(props) {
       </main>
     </React.Fragment>
   );
-}
+};
 
 Container.propTypes = {
   classes: PropTypes.instanceOf(Object).isRequired,

@@ -6,51 +6,49 @@ import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Tooltip from '@material-ui/core/Tooltip';
 
-class CustomTableHead extends React.Component {
-  createSortHandler = property => (event) => {
-    const { onRequestSort } = this.props;
+const CustomTableHead = (props) => {
+  const createSortHandler = property => (event) => {
+    const { onRequestSort } = props;
     onRequestSort(event, property);
   };
 
-  render() {
-    const {
-      order, orderBy, tableRows,
-    } = this.props;
+  const {
+    order, orderBy, tableRows,
+  } = props;
 
-    return (
-      <TableHead>
-        <TableRow>
-          <TableCell padding="checkbox" />
-          {tableRows.map(
-            row => (
-              <TableCell
-                key={row.id}
-                align={row.numeric ? 'right' : 'left'}
-                padding={row.disablePadding ? 'none' : 'default'}
-                sortDirection={orderBy === row.id ? order : false}
+  return (
+    <TableHead>
+      <TableRow>
+        <TableCell padding="checkbox" />
+        {tableRows.map(
+          row => (
+            <TableCell
+              key={row.id}
+              align={row.numeric ? 'right' : 'left'}
+              padding={row.disablePadding ? 'none' : 'default'}
+              sortDirection={orderBy === row.id ? order : false}
+            >
+              <Tooltip
+                title="Sort"
+                placement={row.numeric ? 'bottom-end' : 'bottom-start'}
+                enterDelay={300}
               >
-                <Tooltip
-                  title="Sort"
-                  placement={row.numeric ? 'bottom-end' : 'bottom-start'}
-                  enterDelay={300}
+                <TableSortLabel
+                  active={orderBy === row.id}
+                  direction={order}
+                  onClick={createSortHandler(row.id)}
                 >
-                  <TableSortLabel
-                    active={orderBy === row.id}
-                    direction={order}
-                    onClick={this.createSortHandler(row.id)}
-                  >
-                    {row.label}
-                  </TableSortLabel>
-                </Tooltip>
-              </TableCell>
-            ),
-            this,
-          )}
-        </TableRow>
-      </TableHead>
-    );
-  }
-}
+                  {row.label}
+                </TableSortLabel>
+              </Tooltip>
+            </TableCell>
+          ),
+          this,
+        )}
+      </TableRow>
+    </TableHead>
+  );
+};
 
 CustomTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,

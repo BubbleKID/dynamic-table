@@ -5,7 +5,8 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import '../../../../src/components/api/server';
 import { createShallow } from '@material-ui/core/test-utils';
-import CustomTable, { desc, stableSort, getSorting } from '../../../../src/components/tableComponents/CustomTable';
+import CustomTable from '../../../../src/components/tableComponents/CustomTable';
+import { desc, stableSort, getSorting } from '../../../../src/components/Helper';
 import { getFilterUrl } from '../../../../src/components/TradeTable';
 
 let wrapper;

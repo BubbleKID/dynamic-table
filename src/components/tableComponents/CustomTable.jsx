@@ -7,7 +7,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
 import axios from 'axios';
-import { format } from 'date-fns';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Pagination from 'material-ui-flat-pagination';
 import Select from '@material-ui/core/Select';
@@ -17,31 +16,7 @@ import serverUrl from '../api/server';
 import CustomTableHead from './CustomTableHead';
 import CustomTableToolbar from './CustomTableToolbar';
 import Container from '../../container/Container';
-
-export function desc(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-export function stableSort(array, cmp) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-
-  stabilizedThis.sort((a, b) => {
-    const order = cmp(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map(el => el[0]);
-}
-
-export function getSorting(order, orderBy) {
-  return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
-}
+import { stableSort, getSorting, dateFormat } from '../Helper';
 
 const styles = theme => ({
   root: {
@@ -87,7 +62,7 @@ const styles = theme => ({
 });
 const rowsPerPage = [5, 10, 15, 20];
 
-class TradeTable extends React.Component {
+class CustomTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -114,16 +89,6 @@ class TradeTable extends React.Component {
     } else {
       localStorage.setItem(`${dbName}State`, JSON.stringify(this.state));
     }
-    this.handlePageClick = this.handlePageClick.bind(this);
-    this.handleSearchChange = this.handleSearchChange.bind(this);
-    this.handleRequestSort = this.handleRequestSort.bind(this);
-    this.handleChangeRowsPerPage = this.handleChangeRowsPerPage.bind(this);
-    this.handleFromDateChange = this.handleFromDateChange.bind(this);
-    this.handleToDateChange = this.handleToDateChange.bind(this);
-    this.handleFilterChange = this.handleFilterChange.bind(this);
-    this.handleTableUpdate = this.handleTableUpdate.bind(this);
-    this.handleReset = this.handleReset.bind(this);
-    this.handleCreateTable = this.handleCreateTable.bind(this);
   }
 
   componentDidMount() {
@@ -163,18 +128,18 @@ class TradeTable extends React.Component {
     }
   }
 
-  handlePageClick(event, _offset, _currentPage) {
+  handlePageClick = (event, _offset, _currentPage) => {
     this.setState({
       offset: _offset,
       currentPage: _currentPage,
     });
   }
 
-  handleSearchChange(event) {
+  handleSearchChange = (event) => {
     this.setState({ searchString: event.target.value });
   }
 
-  handleRequestSort(event, property) {
+  handleRequestSort = (event, property) => {
     const newOrderBy = property;
     let newOrder = 'desc';
 
@@ -186,7 +151,7 @@ class TradeTable extends React.Component {
     this.setState({ order: newOrder, orderBy: newOrderBy });
   }
 
-  handleChangeRowsPerPage(event) {
+  handleChangeRowsPerPage = (event) => {
     const { offset } = this.state;
     this.setState({
       size: event.target.value,
@@ -196,26 +161,26 @@ class TradeTable extends React.Component {
     });
   }
 
-  handleFromDateChange(date) {
+  handleFromDateChange = (date) => {
     const { selectedToDate } = this.state;
     const { timeString } = this.props;
     this.setState({
       selectedFromDate: date.toString(),
-      dateUrl: `filter[${timeString}][gte]=${format(date, 'yyyy-MM-dd')}&&filter[${timeString}][lte]=${format(new Date(selectedToDate), 'yyyy-MM-dd')}&&`,
+      dateUrl: `filter[${timeString}][gte]=${dateFormat(date)}&&filter[${timeString}][lte]=${dateFormat(new Date(selectedToDate))}&&`,
     });
   }
 
-  handleToDateChange(date) {
+  handleToDateChange = (date) => {
     const { selectedFromDate } = this.state;
     const { timeString } = this.props;
 
     this.setState({
       selectedToDate: date.toString(),
-      dateUrl: `filter[${timeString}][gte]=${format(new Date(selectedFromDate), 'yyyy-MM-dd')}&&filter[${timeString}][lte]=${format(date, 'yyyy-MM-dd')}&&`,
+      dateUrl: `filter[${timeString}][gte]=${dateFormat(new Date(selectedFromDate))}&&filter[${timeString}][lte]=${dateFormat(date)}&&`,
     });
   }
 
-  handleFilterChange(event) {
+  handleFilterChange = (event) => {
     const { getFilterUrl } = this.props;
     const tempUrl = getFilterUrl(event);
 
@@ -225,7 +190,7 @@ class TradeTable extends React.Component {
     });
   }
 
-  handleCreateTable(data) {
+  handleCreateTable = (data) => {
     const { order, orderBy } = this.state;
     const { timeString } = this.props;
     let displayDate;
@@ -243,7 +208,7 @@ class TradeTable extends React.Component {
       table = stableSort(data, getSorting(order, orderBy))
         .map(
           (n) => {
-            displayDate = format((n[timeString]), 'dd/MM/yyyy');
+            displayDate = dateFormat(n[timeString]);
             return (
               <TableRow
                 hover
@@ -277,7 +242,7 @@ class TradeTable extends React.Component {
     return table;
   }
 
-  handleTableUpdate() {
+  handleTableUpdate = () => {
     const {
       searchString,
       dateUrl,
@@ -351,7 +316,7 @@ class TradeTable extends React.Component {
     }
   }
 
-  handleReset() {
+  handleReset = () => {
     this.setState({
       isReset: true,
       selectedFromDate: new Date('2010-10-10T10:10:10').toString(),
@@ -367,7 +332,13 @@ class TradeTable extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const {
+      classes,
+      tableRows,
+      name,
+      searchPlaceHolder,
+      filterItem,
+    } = this.props;
     const {
       data,
       order,
@@ -381,12 +352,7 @@ class TradeTable extends React.Component {
       size,
       total,
     } = this.state;
-    const {
-      name,
-      searchPlaceHolder,
-      filterItem,
-    } = this.props;
-    const { tableRows } = this.props;
+
     const emptyRows = size - data.length;
 
     return (
@@ -464,7 +430,7 @@ class TradeTable extends React.Component {
   }
 }
 
-TradeTable.propTypes = {
+CustomTable.propTypes = {
   classes: PropTypes.instanceOf(Object).isRequired,
   tableRows: PropTypes.instanceOf(Array).isRequired,
   filterItem: PropTypes.instanceOf(Object).isRequired,
@@ -478,4 +444,4 @@ TradeTable.propTypes = {
   getFilterUrl: PropTypes.func.isRequired,
 };
 
-export default withStyles(styles)(TradeTable);
+export default withStyles(styles)(CustomTable);
