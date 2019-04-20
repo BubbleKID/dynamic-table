@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -8,6 +7,7 @@ import Input from '@material-ui/core/Input';
 import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControl from '@material-ui/core/FormControl';
+import './Filter.sass';
 
 const ITEM_HEIGHT = 64;
 const ITEM_PADDING_TOP = 8;
@@ -20,39 +20,14 @@ const MenuProps = {
   },
 };
 
-const filterStyles = theme => ({
-  filter: {
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    marginRight: theme.spacing.unit * 3,
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginRight: theme.spacing.unit * 3,
-      width: 130,
-    },
-  },
-  formControl: {
-    marginRight: theme.spacing.unit * 3,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginRight: theme.spacing.unit * 3,
-      width: 130,
-    },
-  },
-});
-
-let Filter = (props) => {
+const Filter = (props) => {
   const {
-    selectedFilter,
-    filterItem,
-    handleFilterChange,
-    classes,
+    selectedFilter, filterItem, handleFilterChange,
   } = props;
 
   return (
-    <div className={classes.filter}>
-      <FormControl className={classes.formControl}>
+    <div className="filter">
+      <FormControl className="formControl">
         <InputLabel shrink htmlFor="select-filter">Filter</InputLabel>
         <Select
           multiple
@@ -76,11 +51,10 @@ let Filter = (props) => {
 };
 
 Filter.propTypes = {
-  classes: PropTypes.instanceOf(Object).isRequired,
   handleFilterChange: PropTypes.func.isRequired,
   selectedFilter: PropTypes.instanceOf(Array).isRequired,
   filterItem: PropTypes.instanceOf(Object).isRequired,
 
 };
 
-export default Filter = withStyles(filterStyles)(Filter);
+export default Filter;

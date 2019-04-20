@@ -2,8 +2,7 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
-  AppBar, Button, CssBaseline,
-  Grid, Toolbar, Typography,
+  AppBar, Button, CssBaseline, Grid, Toolbar, Typography,
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import MenuIcon from './MenuIcon';
@@ -35,10 +34,7 @@ const styles = theme => ({
 
 const Container = (props) => {
   const {
-    classes,
-    name,
-    children,
-    history,
+    classes, name, children, history,
   } = props;
   return (
     <React.Fragment>
@@ -61,7 +57,7 @@ const Container = (props) => {
         <div className={classes.heroUnit}>
           <div className={classes.heroContent}>
             <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
-              { name }
+              {`${name.charAt(0).toUpperCase() + name.slice(1)} Table` }
             </Typography>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import CustomTable from './tableComponents/CustomTable';
+import CustomTable from './tableComponents/toolBarComponents/CustomTable/CustomTable';
 
 const tableRows = [
   {
@@ -34,8 +34,7 @@ export function getFilterUrl(event) {
 
 const WithdrawTable = () => (
   <CustomTable
-    name="Withdraws"
-    dbName="withdraws"
+    name="withdraws"
     tableRows={tableRows}
     filterItem={filterItem}
     keyword1="uuid"

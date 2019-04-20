@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {
   TableCell, TableHead, TableRow, TableSortLabel,
 } from '@material-ui/core';
-import './CustomTableHead.css';
+import './CustomTableHead.sass';
 
 const CustomTableHead = (props) => {
   const { onRequestSort } = props;

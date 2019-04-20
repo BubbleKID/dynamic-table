@@ -1,60 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  Table, TableBody, TableCell, TableRow, Paper,
-  LinearProgress, Select, MenuItem, Typography,
+  Table, TableBody, TableCell, TableRow, Paper, LinearProgress, Select, MenuItem, Typography,
 } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
 import axios from 'axios';
 import Pagination from 'material-ui-flat-pagination';
-import serverUrl from '../api/server';
-import CustomTableHead from './toolBarComponents/CustomTableHead/CustomTableHead';
-import CustomTableToolbar from './toolBarComponents/CustomTableToolbar/CustomTableToolbar';
-import Container from '../../container/Container';
-import { stableSort, getSorting, dateFormat } from '../Helper';
+import serverUrl from '../../../api/server';
+import CustomTableHead from '../CustomTableHead/CustomTableHead';
+import CustomTableToolbar from '../CustomTableToolbar/CustomTableToolbar';
+import Container from '../../../../container/Container';
+import { stableSort, getSorting, dateFormat } from '../../../Helper';
+import './CustomTable.sass';
 
-const styles = theme => ({
-  root: {
-    width: '100%',
-    marginTop: theme.spacing.unit * 3,
-  },
-  table: {
-    minWidth: 1020,
-  },
-  tableWrapper: {
-    overflowY: 'visible',
-  },
-  pagination: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '56px',
-
-  },
-  formControl: {
-    margin: theme.spacing.unit,
-    minWidth: 200,
-    maxWidth: 200,
-    height: '24px',
-    display: 'flex',
-  },
-  label: {
-    lineHeight: '1.8em',
-    marginRight: theme.spacing.unit * 2,
-    width: '200px',
-  },
-  sizeSelect: {
-    lineHeight: '1.8em',
-    borderBottom: 0,
-    fontSize: '12px',
-    '&:before': {
-      borderBottom: 0,
-    },
-    '&:after': {
-      borderBottom: 0,
-    },
-  },
-});
 const rowsPerPage = [5, 10, 15, 20];
 
 class CustomTable extends React.Component {
@@ -77,12 +34,12 @@ class CustomTable extends React.Component {
       isLoading: true,
       isReset: false,
     };
-    const { dbName } = this.props;
-    const localState = localStorage.getItem(`${dbName}State`);
+    const { name } = this.props;
+    const localState = localStorage.getItem(`${name}State`);
     if (localState !== null && localState !== undefined) {
       this.state = JSON.parse(localState);
     } else {
-      localStorage.setItem(`${dbName}State`, JSON.stringify(this.state));
+      localStorage.setItem(`${name}State`, JSON.stringify(this.state));
     }
   }
 
@@ -92,15 +49,9 @@ class CustomTable extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     const {
-      searchString,
-      selectedFromDate,
-      selectedToDate,
-      selectedFilter,
-      currentPage,
-      size,
-      isReset,
+      searchString, selectedFromDate, selectedToDate,
+      selectedFilter, currentPage, size, isReset,
     } = this.state;
-
 
     if (isReset !== true) {
       if (searchString !== prevState.searchString) {
@@ -135,15 +86,13 @@ class CustomTable extends React.Component {
   }
 
   handleRequestSort = (event, property) => {
-    const newOrderBy = property;
     let newOrder = 'desc';
-
     const { orderBy, order } = this.state;
     if (orderBy === property && order === 'desc') {
       newOrder = 'asc';
     }
 
-    this.setState({ order: newOrder, orderBy: newOrderBy });
+    this.setState({ order: newOrder, orderBy: property });
   }
 
   handleChangeRowsPerPage = (event) => {
@@ -192,70 +141,49 @@ class CustomTable extends React.Component {
     let table = '';
 
     if (data.length === 0) {
-      table = (
-        <TableRow
-          hover
-          role="checkbox"
-          tabIndex={-1}
-        />
-      );
+      table = <TableRow hover role="checkbox" tabIndex={-1} />;
     } else {
       table = stableSort(data, getSorting(order, orderBy))
-        .map(
-          (n) => {
-            displayDate = dateFormat(n[timeString]);
-            return (
-              <TableRow
-                hover
-                role="checkbox"
-                tabIndex={-1}
-                key={n.uuid}
-              >
-                <TableCell padding="checkbox" />
-                <TableCell component="th" scope="row" padding="none">
-                  {n.uuid}
-                </TableCell>
-                <TableCell align="right">{displayDate}</TableCell>
-                {
-                  Object.values(n).map((item, index) => {
-                    let otherRows;
+        .map((n) => {
+          displayDate = dateFormat(n[timeString]);
+          return (
+            <TableRow hover role="checkbox" tabIndex={-1} key={n.uuid}>
+              <TableCell padding="checkbox" />
+              <TableCell component="th" scope="row" padding="none">
+                {n.uuid}
+              </TableCell>
+              <TableCell align="right">{displayDate}</TableCell>
+              {
+                Object.values(n).map((item, index) => {
+                  let otherRows;
 
-                    if (index > 1 && (typeof (item) !== 'object')) {
-                      otherRows = <TableCell key={item} align="right">{item}</TableCell>;
-                    }
-                    if (typeof (item) === 'object') {
-                      otherRows = <TableCell key={item} align="right">{Object.values(item)[Object.values(item).length - 1]}</TableCell>;
-                    }
-                    return otherRows;
-                  })
-                }
-              </TableRow>
-            );
-          },
-        );
+                  if (index > 1 && (typeof (item) !== 'object')) {
+                    otherRows = <TableCell key={item} align="right">{item}</TableCell>;
+                  }
+                  if (typeof (item) === 'object') {
+                    otherRows = <TableCell key={item} align="right">{Object.values(item)[Object.values(item).length - 1]}</TableCell>;
+                  }
+                  return otherRows;
+                })
+              }
+            </TableRow>
+          );
+        });
     }
     return table;
   }
 
   handleTableUpdate = () => {
     const {
-      searchString,
-      dateUrl,
-      currentPage,
-      size,
-      offset,
-      filterUrl,
+      searchString, dateUrl, currentPage, size, offset, filterUrl,
     } = this.state;
     const {
-      dbName,
-      keyword1,
-      keyword2,
-      keyword3,
+      name, keyword1, keyword2, keyword3,
     } = this.props;
 
     this.setState({ isLoading: true });
     if (searchString === '') {
-      axios.get(`${serverUrl}/${dbName}.json?${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`)
+      axios.get(`${serverUrl}/${name}.json?${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`)
         .then((responese) => {
           const currentTotal = responese.data.pagination.total;
 
@@ -269,7 +197,7 @@ class CustomTable extends React.Component {
             isLoading: false,
             isReset: false,
           });
-          localStorage.setItem(`${dbName}State`, JSON.stringify(this.state));
+          localStorage.setItem(`${name}State`, JSON.stringify(this.state));
         }).catch((err) => {
           this.setState({
             isLoading: false,
@@ -279,9 +207,9 @@ class CustomTable extends React.Component {
         });
     } else {
       axios.all([
-        axios.get(`${serverUrl}/${dbName}.json?filter[${keyword1}]=${searchString}&&${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`),
-        axios.get(`${serverUrl}/${dbName}.json?filter[${keyword2}]=${searchString}&&${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`),
-        axios.get(`${serverUrl}/${dbName}.json?filter[${keyword3}]=${searchString}&&${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`),
+        axios.get(`${serverUrl}/${name}.json?filter[${keyword1}]=${searchString}&&${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`),
+        axios.get(`${serverUrl}/${name}.json?filter[${keyword2}]=${searchString}&&${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`),
+        axios.get(`${serverUrl}/${name}.json?filter[${keyword3}]=${searchString}&&${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`),
       ]).then(axios.spread((uuidRes, volumeRes, priceRes) => {
         const searchResult = uuidRes.data.trades
           .concat(priceRes.data.trades)
@@ -300,7 +228,7 @@ class CustomTable extends React.Component {
           isLoading: false,
           isReset: false,
         });
-        localStorage.setItem(`${dbName}State`, JSON.stringify(this.state));
+        localStorage.setItem(`${name}State`, JSON.stringify(this.state));
       })).catch((err) => {
         this.setState({
           isLoading: false,
@@ -328,34 +256,19 @@ class CustomTable extends React.Component {
 
   render() {
     const {
-      classes,
-      tableRows,
-      name,
-      searchPlaceHolder,
-      filterItem,
+      tableRows, name,
     } = this.props;
     const {
-      data,
-      order,
-      orderBy,
-      selectedFromDate,
-      selectedToDate,
-      searchString,
-      selectedFilter,
-      isLoading,
-      offset,
-      size,
-      total,
+      data, order, orderBy, selectedFromDate, selectedToDate,
+      searchString, selectedFilter, isLoading, offset, size, total,
     } = this.state;
-
     const emptyRows = size - data.length;
 
     return (
       <Container name={name}>
-        <Paper className={classes.root}>
+        <Paper className="root">
           <CustomTableToolbar
-            title={name}
-            searchPlaceHolder={searchPlaceHolder}
+            {...this.props}
             searchString={searchString}
             handleFromDateChange={this.handleFromDateChange}
             handleToDateChange={this.handleToDateChange}
@@ -364,48 +277,37 @@ class CustomTable extends React.Component {
             handleReset={this.handleReset}
             selectedFromDate={selectedFromDate}
             selectedToDate={selectedToDate}
-            filterItem={filterItem}
             selectedFilter={selectedFilter}
           />
-          <div className={classes.tableWrapper}>
-            <Table className={classes.table} aria-labelledby="tableTitle">
+          <div className="tableWrapper">
+            <Table className="table" aria-labelledby="tableTitle">
               <CustomTableHead
                 tableRows={tableRows}
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={this.handleRequestSort}
-                rowCount={data.length}
               />
               <TableBody>
                 {this.handleCreateTable(data)}
-
-                {
-                  emptyRows > 0 && (
-                    <TableRow style={{ height: 48 * emptyRows }}>
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )
-                }
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 48 * emptyRows }}>
+                    <TableCell colSpan={6} />
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>
-          <div className={classes.pagination}>
-            <div className={classes.formControl}>
-              <Typography variant="caption" align="center" color="textPrimary" className={classes.label}>
+          <div className="pagination">
+            <div className="formControl">
+              <Typography variant="caption" align="center" color="textPrimary" className="label">
                 Rows per page:
               </Typography>
               <Select
-                className={classes.sizeSelect}
+                className="sizeSelect"
                 value={size}
                 onChange={e => this.handleChangeRowsPerPage(e)}
               >
-                {
-                  rowsPerPage.map(item => (
-                    <MenuItem key={item} value={item}>
-                      {item}
-                    </MenuItem>
-                  ))
-                }
+                {rowsPerPage.map(item => <MenuItem key={item} value={item}>{item}</MenuItem>)}
               </Select>
             </div>
             <Pagination
@@ -426,11 +328,9 @@ class CustomTable extends React.Component {
 }
 
 CustomTable.propTypes = {
-  classes: PropTypes.instanceOf(Object).isRequired,
   tableRows: PropTypes.instanceOf(Array).isRequired,
   filterItem: PropTypes.instanceOf(Object).isRequired,
   timeString: PropTypes.string.isRequired,
-  dbName: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   keyword1: PropTypes.string.isRequired,
   keyword2: PropTypes.string.isRequired,
@@ -439,4 +339,4 @@ CustomTable.propTypes = {
   getFilterUrl: PropTypes.func.isRequired,
 };
 
-export default withStyles(styles)(CustomTable);
+export default CustomTable;

@@ -1,5 +1,5 @@
 import React from 'react';
-import CustomTable from './tableComponents/CustomTable';
+import CustomTable from './tableComponents/toolBarComponents/CustomTable/CustomTable';
 
 const tableRows = [
   {
@@ -45,8 +45,7 @@ export function getFilterUrl(event) {
 
 const TradeTable = () => (
   <CustomTable
-    name="Trades"
-    dbName="trades"
+    name="trades"
     tableRows={tableRows}
     filterItem={filterItem}
     timeString="updatedAt"

@@ -1,110 +1,52 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
 import {
   Toolbar, Typography, FormControl, Button,
 } from '@material-ui/core';
-import 'date-fns';
 import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers';
-import DateFnsUtils from '@date-io/date-fns';
-import SearchBar from '../SerachBar';
-import Filter from '../Filter';
+import DayjsUtils from '@date-io/dayjs';
+import 'dayjs';
+import SearchBar from '../SearchBar/SerachBar';
+import Filter from '../Filter/Filter';
+import './CustomTableToolbar.sass';
 
-const toolbarStyles = theme => ({
-  root: {
-    paddingRight: theme.spacing.unit,
-    backgroundColor: '#e0e0e0',
-  },
-  spacer: {
-    flex: '1 1 200px',
-  },
-  actions: {
-    color: theme.palette.text.secondary,
-  },
-  title: {
-    flex: '0 0 auto',
-
-  },
-  datepicker: {
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    marginRight: theme.spacing.unit * 3,
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginRight: theme.spacing.unit * 3,
-      width: 120,
-    },
-    minWidth: 120,
-    margin: 0,
-  },
-  buttonContainer: {
-    position: 'relative',
-    marginRight: theme.spacing.unit * 2,
-    marginLeft: 0,
-  },
-  button: {
-    backgroundColor: '#2196f3',
-  },
-  iconButton: {
-    padding: 10,
-  },
-  divider: {
-    width: 1,
-    height: 28,
-    margin: 4,
-  },
-});
-
-let TradeTableToolbar = (props) => {
+const TradeTableToolbar = (props) => {
   const {
-    classes,
-    title,
-    handleFromDateChange,
-    handleToDateChange,
-    handleSearchChange,
-    handleFilterChange,
-    searchString,
-    selectedFromDate,
-    selectedToDate,
-    filterItem,
-    selectedFilter,
-    handleReset,
+    name, handleFromDateChange, handleToDateChange, handleSearchChange, handleFilterChange,
+    searchString, selectedFromDate, selectedToDate, filterItem, selectedFilter, handleReset,
     searchPlaceHolder,
   } = props;
 
   return (
-    <Toolbar
-      className={classes.root}
-    >
-      <div className={classes.title}>
+    <Toolbar className="root">
+      <div className="title">
         <Typography variant="h6" id="tableTitle">
-          { title }
+          { name }
         </Typography>
       </div>
-      <div className={classes.spacer} />
+      <div className="spacer" />
       <SearchBar
         searchPlaceHolder={searchPlaceHolder}
         searchString={searchString}
         handleSearchChange={handleSearchChange}
       />
-      <div className={classes.datepicker}>
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+      <div className="datepicker">
+        <MuiPickersUtilsProvider utils={DayjsUtils}>
           <DatePicker
             label="From"
             value={new Date(selectedFromDate)}
             onChange={handleFromDateChange}
-            format="yyyy-MM-dd"
+            format="YYYY-MM-DD"
           />
         </MuiPickersUtilsProvider>
       </div>
-      <div className={classes.datepicker}>
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+      <div className="datepicker">
+        <MuiPickersUtilsProvider utils={DayjsUtils}>
           <DatePicker
             label="To"
             value={new Date(selectedToDate)}
             onChange={handleToDateChange}
-            format="yyyy-MM-dd"
+            format="YYYY-MM-DD"
           />
         </MuiPickersUtilsProvider>
       </div>
@@ -113,7 +55,7 @@ let TradeTableToolbar = (props) => {
         filterItem={filterItem}
         selectedFilter={selectedFilter}
       />
-      <div className={classes.buttonContainer}>
+      <div className="buttonContainer">
         <FormControl>
           <Button id="reset" variant="outlined" color="secondary" onClick={handleReset}>
             Reset
@@ -125,8 +67,7 @@ let TradeTableToolbar = (props) => {
 };
 
 TradeTableToolbar.propTypes = {
-  classes: PropTypes.instanceOf(Object).isRequired,
-  title: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
   handleFromDateChange: PropTypes.func.isRequired,
   handleToDateChange: PropTypes.func.isRequired,
   handleSearchChange: PropTypes.func.isRequired,
@@ -140,4 +81,4 @@ TradeTableToolbar.propTypes = {
   searchPlaceHolder: PropTypes.string.isRequired,
 };
 
-export default TradeTableToolbar = withStyles(toolbarStyles)(TradeTableToolbar);
+export default TradeTableToolbar;
