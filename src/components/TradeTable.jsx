@@ -1,5 +1,5 @@
 import React from 'react';
-import CustomTable from './tableComponents/toolBarComponents/CustomTable/CustomTable';
+import CustomTable from './tableComponents/CustomTable/CustomTable';
 
 const tableRows = [
   {

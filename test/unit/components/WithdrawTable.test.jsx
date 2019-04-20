@@ -1,12 +1,11 @@
 import React from 'react';
-import { createShallow } from '@material-ui/core/test-utils';
+import { shallow } from 'enzyme';
 import { getFilterUrl } from '../../../src/components/WithdrawTable';
-import CustomTable from '../../../src/components/tableComponents/CustomTable';
+import CustomTable from '../../../src/components/tableComponents/CustomTable/CustomTable';
 
 
 it('handleFilterChange() works correctly', () => {
-  const shallowNew = createShallow({ dive: true });
-  const wrapper = shallowNew(
+  const wrapper = shallow(
     <CustomTable
       tableRows={[
         {

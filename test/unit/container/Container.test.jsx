@@ -15,11 +15,11 @@ describe('Test Container', () => {
 
   it("it direct to trade page when 'Trades' button clicks", () => {
     wrapper.find('button').at(0).simulate('click');
-    expect(wrapper.find('h1').text()).toEqual('Trades');
+    expect(wrapper.find('h1').text()).toEqual('Trades Table');
   });
 
   it("it direct to withdraw page when 'Withdraws' button clicks", () => {
     wrapper.find('button').at(1).simulate('click');
-    expect(wrapper.find('h1').text()).toEqual('Withdraws');
+    expect(wrapper.find('h1').text()).toEqual('Withdraws Table');
   });
 });

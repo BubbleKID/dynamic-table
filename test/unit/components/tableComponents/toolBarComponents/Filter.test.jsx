@@ -1,14 +1,13 @@
 import React from 'react';
-import { createShallow } from '@material-ui/core/test-utils';
+import { shallow } from 'enzyme';
 import Select from '@material-ui/core/Select';
-import Filter from '../../../../../src/components/tableComponents/toolBarComponents/Filter';
+import Filter from '../../../../../src/components/tableComponents/toolBarComponents/Filter/Filter';
 
 describe('TradeTableToolbar', () => {
   const mockMyEventHandler = jest.fn();
   let wrapper;
-  const shallowNew = createShallow({ dive: true });
   beforeEach(() => {
-    wrapper = shallowNew(
+    wrapper = shallow(
       <Filter
         handleFilterChange={mockMyEventHandler}
         filterItem={{
@@ -28,7 +27,6 @@ describe('TradeTableToolbar', () => {
     wrapper.find(Select).simulate('change', { target: { value: 'aaaa' } });
     expect(mockMyEventHandler).toHaveBeenCalled();
   });
-
 
   it('shoud call renderValue correctlt when select filter', () => {
     expect(wrapper.find('#filter-select').props().renderValue(['PROCESSED', 'REJECTED'])).toEqual('PROCESSED, REJECTED');

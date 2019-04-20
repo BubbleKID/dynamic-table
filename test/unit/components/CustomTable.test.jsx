@@ -3,15 +3,14 @@ import Select from '@material-ui/core/Select';
 import TableRow from '@material-ui/core/TableRow';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
-import '../../../../src/components/api/server';
-import { createShallow } from '@material-ui/core/test-utils';
-import CustomTable from '../../../../src/components/tableComponents/toolBarComponents/CustomTable/CustomTable';
-import { getFilterUrl } from '../../../../src/components/TradeTable';
+import '../../../src/components/api/server';
+import { shallow } from 'enzyme';
+import CustomTable from '../../../src/components/tableComponents/CustomTable/CustomTable';
+import { getFilterUrl } from '../../../src/components/TradeTable';
 
 let wrapper;
 beforeEach(() => {
-  const shallowNew = createShallow({ dive: true });
-  wrapper = shallowNew(
+  wrapper = shallow(
     <CustomTable
       tableRows={[
         {
@@ -41,8 +40,7 @@ beforeEach(() => {
         'ETH/BTC': 'symbol',
       }}
       timeString="updatedAt"
-      dbName="trades"
-      name="Trade"
+      name="trades"
       keyword1="uuid"
       keyword2="volume"
       keyword3="price"
@@ -190,6 +188,7 @@ describe('handleTableUpdate() is called', () => {
       wrapper.setState({
         searchString: '',
         total: 42,
+        offset: 20,
       });
       const spyHandleTableUpdate = jest.spyOn(wrapper.instance(), 'handleTableUpdate');
       const mock = new MockAdapter(axios);
@@ -203,7 +202,7 @@ describe('handleTableUpdate() is called', () => {
     it('when filterString changes and offset > currentTotal ', async () => {
       wrapper.setState({
         searchString: '',
-        total: 42,
+        total: 10,
         offset: 50,
       });
       const spyHandleTableUpdate = jest.spyOn(wrapper.instance(), 'handleTableUpdate');

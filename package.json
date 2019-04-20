@@ -62,7 +62,7 @@
       "<rootDir>test/setupTests.js"
     ],
     "moduleNameMapper": {
-      "\\.(css|less)$": "<rootDir>/test/unit/__mocks__/styleMock.js"
+      "\\.(sass)$": "<rootDir>/test/unit/__mocks__/styleMock.js"
     }
   }
 }

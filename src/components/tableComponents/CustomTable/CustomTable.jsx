@@ -5,11 +5,11 @@ import {
 } from '@material-ui/core';
 import axios from 'axios';
 import Pagination from 'material-ui-flat-pagination';
-import serverUrl from '../../../api/server';
+import serverUrl from '../../api/server';
 import CustomTableHead from '../CustomTableHead/CustomTableHead';
 import CustomTableToolbar from '../CustomTableToolbar/CustomTableToolbar';
-import Container from '../../../../container/Container';
-import { stableSort, getSorting, dateFormat } from '../../../Helper';
+import Container from '../../../container/Container';
+import { stableSort, getSorting, dateFormat } from '../../Helper';
 import './CustomTable.sass';
 
 const rowsPerPage = [5, 10, 15, 20];

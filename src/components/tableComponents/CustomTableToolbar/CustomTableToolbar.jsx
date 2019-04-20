@@ -6,8 +6,8 @@ import {
 import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers';
 import DayjsUtils from '@date-io/dayjs';
 import 'dayjs';
-import SearchBar from '../SearchBar/SerachBar';
-import Filter from '../Filter/Filter';
+import SearchBar from '../toolBarComponents/SearchBar/SerachBar';
+import Filter from '../toolBarComponents/Filter/Filter';
 import './CustomTableToolbar.sass';
 
 const TradeTableToolbar = (props) => {

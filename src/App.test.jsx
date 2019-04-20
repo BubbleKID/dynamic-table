@@ -1,8 +1,8 @@
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { mount } from 'enzyme';
-import App from '../../src/App';
-import TradeTable from '../../src/components/TradeTable';
+import App from './App';
+import TradeTable from './components/TradeTable';
 
 it('it render Trade correctly', () => {
   const wrapper = mount(
