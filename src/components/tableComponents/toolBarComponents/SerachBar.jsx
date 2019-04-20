@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import SearchIcon from '@material-ui/icons/Search';
 import InputBase from '@material-ui/core/InputBase';
 import { withStyles } from '@material-ui/core/styles';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
+import SearchIcon from './SearchIcon';
 
 const searchBarStyles = theme => ({
   inputRoot: {

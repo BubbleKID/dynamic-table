@@ -1,15 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
-import AppBar from '@material-ui/core/AppBar';
-import InsertChartOutlined from '@material-ui/icons/InsertChartOutlined';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Grid from '@material-ui/core/Grid';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import { withRouter } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import {
+  AppBar, Button, CssBaseline,
+  Grid, Toolbar, Typography,
+} from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
+import MenuIcon from './MenuIcon';
 
 const styles = theme => ({
   appBar: {
@@ -48,7 +45,7 @@ const Container = (props) => {
       <CssBaseline />
       <AppBar position="static" className={classes.appBar}>
         <Toolbar>
-          <InsertChartOutlined className={classes.icon} />
+          <MenuIcon className={classes.icon} />
           <Typography variant="h6" color="inherit" noWrap className={classes.icon}>
             Dynamic Table
           </Typography>
@@ -68,7 +65,7 @@ const Container = (props) => {
             </Typography>
           </div>
         </div>
-        <div className={classNames(classes.layout, classes.cardGrid)}>
+        <div className={classes.layout}>
           <Grid container spacing={40}>
             {children}
           </Grid>

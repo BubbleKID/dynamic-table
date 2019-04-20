@@ -38,7 +38,6 @@
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
     "jest": "^24.7.1",
-    "sinon": "^7.3.1",
     "style-loader": "^0.23.1",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
@@ -47,10 +46,7 @@
   "dependencies": {
     "@date-io/date-fns": "^1.1.0",
     "@material-ui/core": "^3.9.3",
-    "@material-ui/icons": "^3.0.2",
     "axios": "^0.18.0",
-    "chai": "^4.2.0",
-    "classnames": "^2.2.6",
     "date-fns": "^2.0.0-alpha.27",
     "material-ui-flat-pagination": "^3.2.0",
     "material-ui-pickers": "^2.2.4",
@@ -62,6 +58,9 @@
   "jest": {
     "setupFilesAfterEnv": [
       "<rootDir>test/setupTests.js"
-    ]
+    ],
+    "moduleNameMapper": {
+      "\\.(css|less)$": "<rootDir>/test/unit/__mocks__/styleMock.js"
+    }
   }
 }

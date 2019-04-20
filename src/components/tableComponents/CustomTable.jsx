@@ -1,20 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
+import {
+  Table, TableBody, TableCell, TableRow, Paper,
+  LinearProgress, Select, MenuItem, Typography,
+} from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import axios from 'axios';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import Pagination from 'material-ui-flat-pagination';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import Typography from '@material-ui/core/Typography';
 import serverUrl from '../api/server';
-import CustomTableHead from './CustomTableHead';
-import CustomTableToolbar from './CustomTableToolbar';
+import CustomTableHead from './toolBarComponents/CustomTableHead/CustomTableHead';
+import CustomTableToolbar from './toolBarComponents/CustomTableToolbar/CustomTableToolbar';
 import Container from '../../container/Container';
 import { stableSort, getSorting, dateFormat } from '../Helper';
 
@@ -27,7 +22,7 @@ const styles = theme => ({
     minWidth: 1020,
   },
   tableWrapper: {
-    overflowX: 'auto',
+    overflowY: 'visible',
   },
   pagination: {
     display: 'flex',

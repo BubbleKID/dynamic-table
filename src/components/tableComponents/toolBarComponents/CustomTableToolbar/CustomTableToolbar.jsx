@@ -1,15 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
+import {
+  Toolbar, Typography, FormControl, Button,
+} from '@material-ui/core';
 import 'date-fns';
 import { MuiPickersUtilsProvider, DatePicker } from 'material-ui-pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import FormControl from '@material-ui/core/FormControl';
-import Button from '@material-ui/core/Button';
-import SearchBar from './toolBarComponents/SerachBar';
-import Filter from './toolBarComponents/Filter';
+import SearchBar from '../SerachBar';
+import Filter from '../Filter';
 
 const toolbarStyles = theme => ({
   root: {

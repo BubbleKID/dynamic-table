@@ -18,5 +18,17 @@ module.exports = {
     sourceType: 'module'
   },
   plugins: ['react'],
-  rules: {}
+  rules: {
+    "react/jsx-filename-extension": [0]
+  },
+  settings: {
+    'import/resolver': {
+      "node": {
+        "extensions": [
+          ".js",
+          ".jsx"
+        ]
+      }
+    }
+  }
 };

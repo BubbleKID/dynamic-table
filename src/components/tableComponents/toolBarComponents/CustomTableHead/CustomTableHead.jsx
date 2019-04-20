@@ -1,17 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Tooltip from '@material-ui/core/Tooltip';
+import {
+  TableCell, TableHead, TableRow, TableSortLabel,
+} from '@material-ui/core';
+import './CustomTableHead.css';
 
 const CustomTableHead = (props) => {
+  const { onRequestSort } = props;
   const createSortHandler = property => (event) => {
-    const { onRequestSort } = props;
     onRequestSort(event, property);
   };
-
   const {
     order, orderBy, tableRows,
   } = props;
@@ -28,19 +26,15 @@ const CustomTableHead = (props) => {
               padding={row.disablePadding ? 'none' : 'default'}
               sortDirection={orderBy === row.id ? order : false}
             >
-              <Tooltip
-                title="Sort"
-                placement={row.numeric ? 'bottom-end' : 'bottom-start'}
-                enterDelay={300}
+              <TableSortLabel
+                className="tooltip"
+                active={orderBy === row.id}
+                direction={order}
+                onClick={createSortHandler(row.id)}
               >
-                <TableSortLabel
-                  active={orderBy === row.id}
-                  direction={order}
-                  onClick={createSortHandler(row.id)}
-                >
-                  {row.label}
-                </TableSortLabel>
-              </Tooltip>
+                <span className="tooltiptext">{`Sort by ${row.label}`}</span>
+                {row.label}
+              </TableSortLabel>
             </TableCell>
           ),
           this,

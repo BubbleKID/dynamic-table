@@ -4,7 +4,6 @@ import { mount } from 'enzyme';
 import App from '../../src/App';
 import TradeTable from '../../src/components/TradeTable';
 
-
 it('it render Trade correctly', () => {
   const wrapper = mount(
     <MemoryRouter initialEntries={['/']}>

@@ -6,7 +6,6 @@ import axios from 'axios';
 import '../../../../src/components/api/server';
 import { createShallow } from '@material-ui/core/test-utils';
 import CustomTable from '../../../../src/components/tableComponents/CustomTable';
-import { desc, stableSort, getSorting } from '../../../../src/components/Helper';
 import { getFilterUrl } from '../../../../src/components/TradeTable';
 
 let wrapper;
@@ -54,28 +53,6 @@ beforeEach(() => {
 });
 
 describe('Test CustomTable', () => {
-  describe('desc() function', () => {
-    describe('given three values', () => {
-      it('it should get compare result 1, -1 or 0', () => {
-        expect(desc({ price: 10 }, { price: 20 }, 'price')).toBe(1);
-        expect(desc({ price: 20 }, { price: 10 }, 'price')).toBe(-1);
-        expect(desc('a', 'b', 'price')).toBe(0);
-      });
-    });
-  });
-
-  describe('stableSort() function', () => {
-    describe('given two values', () => {
-      it('it should get sorted result', () => {
-        expect(stableSort([{ price: 10 }, { price: 20 }], getSorting('desc', 'price')))
-          .toEqual([{ price: 20 }, { price: 10 }]);
-        expect(stableSort([{ price: 10 }, { price: 20 }], getSorting(0, 'price')))
-          .toEqual([{ price: 10 }, { price: 20 }]);
-        expect(stableSort(['', ''], getSorting('', ''))).toEqual(['', '']);
-      });
-    });
-  });
-
   describe('handleChangeRowsPerPage() is called', () => {
     it("when RowsPerPage 'select' changes offset equals 0", () => {
       const handleChangeRowsPerPage = jest.spyOn(wrapper.instance(), 'handleChangeRowsPerPage');
