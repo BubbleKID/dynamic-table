@@ -5,6 +5,7 @@ import {
   AppBar, Button, CssBaseline, Grid, Toolbar, Typography,
 } from '@material-ui/core';
 import MenuIcon from './MenuIcon';
+import './Container.sass';
 
 const Container = (props) => {
   const {
