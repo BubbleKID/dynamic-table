@@ -36,7 +36,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['*', '.js', '.jsx'],
+    extensions: ['*', '.js', '.jsx', '.sass'],
   },
   devServer: {
     historyApiFallback: true,
