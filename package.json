@@ -47,11 +47,11 @@
   },
   "dependencies": {
     "@date-io/dayjs": "^1.2.0",
-    "@material-ui/core": "^3.9.3",
+    "@material-ui/core": "^4.0.0-alpha.8",
     "axios": "^0.18.0",
     "dayjs": "^1.8.12",
     "material-ui-flat-pagination": "^3.2.0",
-    "material-ui-pickers": "^2.2.4",
+    "material-ui-pickers": "^3.0.0-alpha.2",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
