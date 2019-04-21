@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import Select from '@material-ui/core/Select';
-import Filter from '../../../../../src/components/tableComponents/toolBarComponents/Filter/Filter';
+import Filter from '../../../../../src/Components/TableComponents/ToolBarComponents/Filter/Filter';
 
 describe('TradeTableToolbar', () => {
   const mockMyEventHandler = jest.fn();

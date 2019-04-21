@@ -3,7 +3,7 @@ import {
   stableSort,
   getSorting,
   dateFormat,
-} from '../../../src/components/Helper';
+} from '../../../src/Components/Helper';
 
 describe('desc() function', () => {
   describe('given three values', () => {

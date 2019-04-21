@@ -3,10 +3,10 @@ import Select from '@material-ui/core/Select';
 import TableRow from '@material-ui/core/TableRow';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
-import '../../../src/components/api/server';
+import '../../../src/Components/api/server';
 import { shallow } from 'enzyme';
-import CustomTable from '../../../src/components/tableComponents/CustomTable/CustomTable';
-import { getFilterUrl } from '../../../src/components/TradeTable';
+import CustomTable from '../../../src/Components/TableComponents/CustomTable/CustomTable';
+import { getFilterUrl } from '../../../src/Components/TradeTable';
 
 let wrapper;
 beforeEach(() => {

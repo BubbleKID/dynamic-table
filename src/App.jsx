@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import TradeTable from './components/TradeTable';
-import WithdrawTable from './components/WithdrawTable';
+import TradeTable from './Components/TradeTable';
+import WithdrawTable from './Components/WithdrawTable';
 
 const App = () => (
   <Router>

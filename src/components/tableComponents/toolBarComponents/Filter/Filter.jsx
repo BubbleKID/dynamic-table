@@ -1,12 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import Input from '@material-ui/core/Input';
-import ListItemText from '@material-ui/core/ListItemText';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControl from '@material-ui/core/FormControl';
+import {
+  Select, InputLabel, MenuItem, Input, ListItemText, Checkbox, FormControl,
+} from '@material-ui/core';
 import './Filter.sass';
 
 const ITEM_HEIGHT = 64;

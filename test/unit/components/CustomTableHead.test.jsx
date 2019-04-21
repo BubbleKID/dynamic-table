@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, TableSortLabel } from '@material-ui/core';
 import { mount } from 'enzyme';
-import CustomTableHead from '../../../src/components/tableComponents/CustomTableHead/CustomTableHead';
+import CustomTableHead from '../../../src/Components/TableComponents/CustomTableHead/CustomTableHead';
 
 it('handle changing an sort label', () => {
   const mockOnRequestSort = jest.fn();

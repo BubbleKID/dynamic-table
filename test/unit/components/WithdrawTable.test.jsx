@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { getFilterUrl } from '../../../src/components/WithdrawTable';
-import CustomTable from '../../../src/components/tableComponents/CustomTable/CustomTable';
+import { getFilterUrl } from '../../../src/Components/WithdrawTable';
+import CustomTable from '../../../src/Components/TableComponents/CustomTable/CustomTable';
 
 
 it('handleFilterChange() works correctly', () => {
