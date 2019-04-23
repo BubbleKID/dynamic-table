@@ -5,6 +5,7 @@ import App from '../../../src/App';
 
 describe('Test Container', () => {
   let wrapper;
+  window.console.error = jest.fn(); // Ignore Material-UI warning
   beforeEach(() => {
     wrapper = mount(
       <MemoryRouter initialEntries={['/', '/trades', 'withdraws']} initialIndex={1}>
