@@ -22,10 +22,3 @@ export function stableSort(array, cmp) {
 export function getSorting(order, orderBy) {
   return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
 }
-
-export function dateFormat(date) {
-  const year = (new Date(date)).getFullYear();
-  const month = ((new Date(date)).getMonth() < 10 ? '0' : '') + ((new Date(date)).getMonth() + 1);
-  const day = ((new Date(date)).getDate() < 10 ? '0' : '') + (new Date(date)).getDate();
-  return (`${year}-${month}-${day}`);
-}

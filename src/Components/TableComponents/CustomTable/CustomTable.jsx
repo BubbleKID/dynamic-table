@@ -3,17 +3,15 @@ import PropTypes from 'prop-types';
 import {
   Table, TableBody, TableCell, TableRow, Paper, LinearProgress, Select, MenuItem, Typography,
 } from '@material-ui/core';
-import axios from 'axios';
+import dayjs from 'dayjs';
 import Pagination from 'material-ui-flat-pagination';
-import serverUrl from '../../api/server';
 import CustomTableHead from '../CustomTableHead/CustomTableHead';
 import CustomTableToolbar from '../CustomTableToolbar/CustomTableToolbar';
 import Container from '../../../Container/Container';
-import { stableSort, getSorting, dateFormat } from '../../Helper';
+import { stableSort, getSorting } from '../../Helper';
 import './CustomTable.sass';
 
 const rowsPerPage = [5, 10, 15, 20];
-
 class CustomTable extends React.Component {
   constructor(props) {
     super(props);
@@ -28,9 +26,7 @@ class CustomTable extends React.Component {
       selectedFromDate: new Date('2010-10-10T10:10:10').toString(),
       selectedToDate: new Date().toString(),
       searchString: '',
-      filterUrl: '',
       selectedFilter: [],
-      dateUrl: '',
       isLoading: true,
       isReset: false,
     };
@@ -106,31 +102,20 @@ class CustomTable extends React.Component {
   }
 
   handleFromDateChange = (date) => {
-    const { selectedToDate } = this.state;
-    const { timeString } = this.props;
     this.setState({
       selectedFromDate: date.toString(),
-      dateUrl: `filter[${timeString}][gte]=${dateFormat(date)}&&filter[${timeString}][lte]=${dateFormat(new Date(selectedToDate))}&&`,
     });
   }
 
   handleToDateChange = (date) => {
-    const { selectedFromDate } = this.state;
-    const { timeString } = this.props;
-
     this.setState({
       selectedToDate: date.toString(),
-      dateUrl: `filter[${timeString}][gte]=${dateFormat(new Date(selectedFromDate))}&&filter[${timeString}][lte]=${dateFormat(date)}&&`,
     });
   }
 
   handleFilterChange = (event) => {
-    const { getFilterUrl } = this.props;
-    const tempUrl = getFilterUrl(event);
-
     this.setState({
       selectedFilter: event.target.value,
-      filterUrl: tempUrl,
     });
   }
 
@@ -145,7 +130,7 @@ class CustomTable extends React.Component {
     } else {
       table = stableSort(data, getSorting(order, orderBy))
         .map((n) => {
-          displayDate = dateFormat(n[timeString]);
+          displayDate = dayjs(n[timeString]).format('YYYY-MM-DD');
           return (
             <TableRow hover role="checkbox" tabIndex={-1} key={n.uuid}>
               <TableCell padding="checkbox" />
@@ -175,68 +160,53 @@ class CustomTable extends React.Component {
 
   handleTableUpdate = () => {
     const {
-      searchString, dateUrl, currentPage, size, offset, filterUrl,
+      searchString, currentPage, size, offset,
+      selectedFilter, selectedFromDate, selectedToDate,
     } = this.state;
     const {
-      name, keyword1, keyword2, keyword3,
+      name,
     } = this.props;
 
     this.setState({ isLoading: true });
-    if (searchString === '') {
-      axios.get(`${serverUrl}/${name}.json?${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`)
-        .then((responese) => {
-          const currentTotal = responese.data.pagination.total;
+    const getTradeQuery = `
+      {
+        trade2 (
+          searchString: "${searchString}",
+          filter: ["${selectedFilter.join('","')}"],
+          fromDate: "${selectedFromDate}",
+          toDate: "${selectedToDate}",
+        )
+        {
+          uuid
+          updatedAt
+          volume
+          price
+          side
+          tradingPair {
+            uuid
+            symbol
+          }
+        }
+      }
+    `;
 
-          this.setState({
-            total: currentTotal,
-            data: responese.data.trades,
-            offset: offset > currentTotal ? 0 : offset,
-            currentPage: currentPage > Math.ceil(currentTotal / size) ? 1 : currentPage,
-            // Update pagination (offset, currentPage) manually
-            // if 'Rows per page' , 'Filter' etc changes
-            isLoading: false,
-            isReset: false,
-          });
-          localStorage.setItem(`${name}State`, JSON.stringify(this.state));
-        }).catch((err) => {
-          this.setState({
-            isLoading: false,
-            isReset: false,
-          });
-          window.console.error(err);
-        });
-    } else {
-      axios.all([
-        axios.get(`${serverUrl}/${name}.json?filter[${keyword1}]=${searchString}&&${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`),
-        axios.get(`${serverUrl}/${name}.json?filter[${keyword2}]=${searchString}&&${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`),
-        axios.get(`${serverUrl}/${name}.json?filter[${keyword3}]=${searchString}&&${filterUrl}${dateUrl}[pagination][number]=${currentPage}&&[pagination][size]=${size}`),
-      ]).then(axios.spread((uuidRes, volumeRes, priceRes) => {
-        const searchResult = uuidRes.data.trades
-          .concat(priceRes.data.trades)
-          .concat(volumeRes.data.trades);
-        const currentTotal = uuidRes.data.pagination.total
-        + volumeRes.data.pagination.total
-        + priceRes.data.pagination.total;
-
-        this.setState({
-          total: currentTotal,
-          offset: offset > currentTotal ? 0 : offset,
-          currentPage: currentPage > Math.ceil(currentTotal / size) ? 1 : currentPage,
-          // Update pagination (offset, currentPage) manually
-          // if 'Rows per page' , 'Filter' etc changes
-          data: searchResult,
-          isLoading: false,
-          isReset: false,
-        });
-        localStorage.setItem(`${name}State`, JSON.stringify(this.state));
-      })).catch((err) => {
-        this.setState({
-          isLoading: false,
-          isReset: false,
-        });
-        window.console.error(err);
+    fetch(`http://localhost:3000/trades?query=${getTradeQuery}`)
+      .then(response => response.json())
+      .then((dataJson) => {
+        console.log(dataJson.data.trade2);
+        this.setState({ data: dataJson.data.trade2 });
       });
-    }
+    this.setState({
+      total: 42,
+      offset: 0,
+      currentPage: 1,
+      // Update pagination (offset, currentPage) manually
+      // if 'Rows per page' , 'Filter' etc changes
+      isLoading: false,
+      isReset: false,
+    });
+
+    localStorage.setItem(`${name}State`, JSON.stringify(this.state));
   }
 
   handleReset = () => {
@@ -245,9 +215,7 @@ class CustomTable extends React.Component {
       selectedFromDate: new Date('2010-10-10T10:10:10').toString(),
       selectedToDate: new Date().toString(),
       searchString: '',
-      filterUrl: '',
       selectedFilter: [],
-      dateUrl: '',
       currentPage: 1,
       offset: 0,
       size: 5,
@@ -332,11 +300,7 @@ CustomTable.propTypes = {
   filterItem: PropTypes.instanceOf(Object).isRequired,
   timeString: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  keyword1: PropTypes.string.isRequired,
-  keyword2: PropTypes.string.isRequired,
-  keyword3: PropTypes.string.isRequired,
   searchPlaceHolder: PropTypes.string.isRequired,
-  getFilterUrl: PropTypes.func.isRequired,
 };
 
 export default CustomTable;
