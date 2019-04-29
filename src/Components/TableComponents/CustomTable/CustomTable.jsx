@@ -21,7 +21,7 @@ class CustomTable extends React.Component {
       data: [],
       offset: 0,
       size: 5,
-      currentPage: 1,
+      currentPage: 0,
       total: '',
       selectedFromDate: new Date('2010-10-10T10:10:10').toString(),
       selectedToDate: new Date().toString(),
@@ -160,53 +160,51 @@ class CustomTable extends React.Component {
 
   handleTableUpdate = () => {
     const {
-      searchString, currentPage, size, offset,
-      selectedFilter, selectedFromDate, selectedToDate,
+      searchString, currentPage, size, selectedFilter, selectedFromDate, selectedToDate,
     } = this.state;
     const {
       name,
     } = this.props;
-
-    this.setState({ isLoading: true });
     const getTradeQuery = `
       {
-        trade2 (
+        mainQuery (
           searchString: "${searchString}",
           filter: ["${selectedFilter.join('","')}"],
           fromDate: "${selectedFromDate}",
           toDate: "${selectedToDate}",
-        )
-        {
-          uuid
-          updatedAt
-          volume
-          price
-          side
-          tradingPair {
+          number: ${currentPage},
+          size: ${size},
+        ){
+          trades {
             uuid
-            symbol
+            updatedAt
+            volume
+            price
+            side
+            tradingPair {
+              uuid
+              symbol
+            }
+          }
+          pageInfo {
+            total
           }
         }
       }
     `;
-
+    this.setState({ isLoading: true });
     fetch(`http://localhost:3000/trades?query=${getTradeQuery}`)
       .then(response => response.json())
       .then((dataJson) => {
-        console.log(dataJson.data.trade2);
-        this.setState({ data: dataJson.data.trade2 });
+        window.console.log(dataJson.data.mainQuery.trades);
+        this.setState({
+          data: dataJson.data.mainQuery.trades,
+          total: dataJson.data.mainQuery.pageInfo.total,
+          isLoading: false,
+          isReset: false,
+        });
+        localStorage.setItem(`${name}State`, JSON.stringify(this.state));
       });
-    this.setState({
-      total: 42,
-      offset: 0,
-      currentPage: 1,
-      // Update pagination (offset, currentPage) manually
-      // if 'Rows per page' , 'Filter' etc changes
-      isLoading: false,
-      isReset: false,
-    });
-
-    localStorage.setItem(`${name}State`, JSON.stringify(this.state));
   }
 
   handleReset = () => {
