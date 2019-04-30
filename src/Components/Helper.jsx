@@ -1,8 +1,11 @@
+import dayjs from 'dayjs';
+
 export function desc(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
+  if (b[orderBy] < a[orderBy] || dayjs(a[orderBy]).isAfter(dayjs(b[orderBy]))
+    || b[orderBy].symbol < a[orderBy].symbol) {
     return -1;
   }
-  if (b[orderBy] > a[orderBy]) {
+  if (b[orderBy] > a[orderBy] || dayjs(b[orderBy]).isAfter(dayjs(a[orderBy]))) {
     return 1;
   }
   return 0;

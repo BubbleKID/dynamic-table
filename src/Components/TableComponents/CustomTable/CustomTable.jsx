@@ -87,7 +87,6 @@ class CustomTable extends React.Component {
     if (orderBy === property && order === 'desc') {
       newOrder = 'asc';
     }
-
     this.setState({ order: newOrder, orderBy: property });
   }
 
@@ -142,10 +141,10 @@ class CustomTable extends React.Component {
                 Object.values(n).map((item, index) => {
                   let otherRows;
 
-                  if (index > 1 && (typeof (item) !== 'object')) {
+                  if (index > 1 && (typeof item !== 'object')) {
                     otherRows = <TableCell key={item} align="right">{item}</TableCell>;
                   }
-                  if (typeof (item) === 'object') {
+                  if (typeof item === 'object') {
                     otherRows = <TableCell key={item} align="right">{Object.values(item)[Object.values(item).length - 1]}</TableCell>;
                   }
                   return otherRows;

@@ -18,7 +18,7 @@ const tableRows = [
     id: 'side', numeric: true, disablePadding: false, label: 'Side',
   },
   {
-    id: 'tradingPairSymbol', numeric: true, disablePadding: false, label: 'Trading Pair Symbol',
+    id: 'tradingPair', numeric: true, disablePadding: false, label: 'Trading Pair Symbol',
   },
 ];
 
