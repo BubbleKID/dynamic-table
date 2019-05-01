@@ -24,12 +24,32 @@ const filterItem = {
   REJECTED: 'status',
 };
 
-export function getFilterUrl(event) {
-  let tempUrl = '';
-  event.target.value.forEach((item) => {
-    tempUrl += `filter[status]=${item}&&`;
-  });
-  return tempUrl;
+function createQuery(
+  searchString, selectedFilter, selectedFromDate, selectedToDate, currentPage, size,
+) {
+  return `
+  {
+    mainQuery (
+      searchString: "${searchString}",
+      filter: ["${selectedFilter.join('","')}"],
+      fromDate: "${selectedFromDate}",
+      toDate: "${selectedToDate}",
+      number: ${currentPage},
+      size: ${size},
+    ){
+      withdraws {
+        uuid
+        createdAt
+        amount
+        status
+        bankReferenceNumber
+      }
+      pageInfo {
+        total
+      }
+    }
+  }
+  `;
 }
 
 const WithdrawTable = () => (
@@ -42,7 +62,7 @@ const WithdrawTable = () => (
     keyword3="bankReferenceNumber"
     timeString="createdAt"
     searchPlaceHolder="Uuid, Amount, Bank reference number"
-    getFilterUrl={getFilterUrl}
+    createQuery={createQuery}
   />
 );
 

@@ -1,8 +1,13 @@
+import dayjs from 'dayjs';
+
 export function desc(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
+  if (b[orderBy] < a[orderBy] || dayjs(a[orderBy]).isAfter(dayjs(b[orderBy]))) {
     return -1;
   }
-  if (b[orderBy] > a[orderBy]) {
+  if (typeof [orderBy] === 'object' || b[orderBy].symbol < a[orderBy].symbol) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy] || dayjs(b[orderBy]).isAfter(dayjs(a[orderBy]))) {
     return 1;
   }
   return 0;
@@ -21,11 +26,4 @@ export function stableSort(array, cmp) {
 
 export function getSorting(order, orderBy) {
   return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
-}
-
-export function dateFormat(date) {
-  const year = (new Date(date)).getFullYear();
-  const month = ((new Date(date)).getMonth() < 10 ? '0' : '') + ((new Date(date)).getMonth() + 1);
-  const day = ((new Date(date)).getDate() < 10 ? '0' : '') + (new Date(date)).getDate();
-  return (`${year}-${month}-${day}`);
 }

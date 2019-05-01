@@ -18,7 +18,7 @@ const tableRows = [
     id: 'side', numeric: true, disablePadding: false, label: 'Side',
   },
   {
-    id: 'tradingPairSymbol', numeric: true, disablePadding: false, label: 'Trading Pair Symbol',
+    id: 'tradingPair', numeric: true, disablePadding: false, label: 'Trading Pair Symbol',
   },
 ];
 
@@ -30,17 +30,36 @@ const filterItem = {
   'ETH/BTC': 'symbol',
 };
 
-export function getFilterUrl(event) {
-  let tempUrl = '';
-  event.target.value.forEach((item) => {
-    if ((filterItem[item]) === 'side') {
-      tempUrl += `filter[side]=${item}&&`;
+function createQuery(
+  searchString, selectedFilter, selectedFromDate, selectedToDate, currentPage, size,
+) {
+  return `
+  {
+    mainQuery (
+      searchString: "${searchString}",
+      filter: ["${selectedFilter.join('","')}"],
+      fromDate: "${selectedFromDate}",
+      toDate: "${selectedToDate}",
+      number: ${currentPage},
+      size: ${size},
+    ){
+      trades {
+        uuid
+        updatedAt
+        volume
+        price
+        side
+        tradingPair {
+          uuid
+          symbol
+        }
+      }
+      pageInfo {
+        total
+      }
     }
-    if ((filterItem[item]) === 'symbol') {
-      tempUrl += `filter[tradingPair][symbol][inq]=${item}&&`;
-    }
-  });
-  return tempUrl;
+  }
+  `;
 }
 
 const TradeTable = () => (
@@ -49,11 +68,8 @@ const TradeTable = () => (
     tableRows={tableRows}
     filterItem={filterItem}
     timeString="updatedAt"
-    keyword1="uuid"
-    keyword2="volume"
-    keyword3="price"
     searchPlaceHolder="Uuid, Volume, Price"
-    getFilterUrl={getFilterUrl}
+    createQuery={createQuery}
   />
 );
 
