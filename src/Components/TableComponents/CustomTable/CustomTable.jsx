@@ -21,7 +21,7 @@ class CustomTable extends React.Component {
       data: [],
       offset: 0,
       size: 5,
-      currentPage: 0,
+      currentPage: 1,
       total: '',
       selectedFromDate: new Date('2018-01-01'),
       selectedToDate: new Date(),
@@ -100,7 +100,6 @@ class CustomTable extends React.Component {
   handleFromDateChange = date => this.setState({ selectedFromDate: date })
 
   handleDateChange = (date, name) => this.setState({ [name]: date })
-
 
   handleFilterChange = event => this.setState({ selectedFilter: event.target.value })
 
