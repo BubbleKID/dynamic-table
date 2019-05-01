@@ -1,3 +1,3 @@
-const serverUrl = 'https://dynamic-server.herokuapp.com';
+const serverUrl = 'https://graphql-table-server.herokuapp.com';
 
 export default serverUrl;

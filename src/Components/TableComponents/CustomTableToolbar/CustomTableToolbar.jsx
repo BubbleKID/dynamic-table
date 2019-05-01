@@ -10,9 +10,9 @@ import SearchBar from '../ToolBarComponents/SearchBar/SerachBar';
 import Filter from '../ToolBarComponents/Filter/Filter';
 import './CustomTableToolbar.sass';
 
-const TradeTableToolbar = (props) => {
+const CustomTableToolbar = (props) => {
   const {
-    name, handleFromDateChange, handleToDateChange, handleSearchChange, handleFilterChange,
+    name, handleDateChange, handleSearchChange, handleFilterChange,
     searchString, selectedFromDate, selectedToDate, filterItem, selectedFilter, handleReset,
     searchPlaceHolder,
   } = props;
@@ -34,8 +34,8 @@ const TradeTableToolbar = (props) => {
         <MuiPickersUtilsProvider utils={DayjsUtils}>
           <DatePicker
             label="From"
-            value={new Date(selectedFromDate)}
-            onChange={handleFromDateChange}
+            value={selectedFromDate}
+            onChange={date => handleDateChange(date, 'selectedFromDate')}
             format="YYYY-MM-DD"
           />
         </MuiPickersUtilsProvider>
@@ -44,8 +44,8 @@ const TradeTableToolbar = (props) => {
         <MuiPickersUtilsProvider utils={DayjsUtils}>
           <DatePicker
             label="To"
-            value={new Date(selectedToDate)}
-            onChange={handleToDateChange}
+            value={selectedToDate}
+            onChange={date => handleDateChange(date, 'selectedToDate')}
             format="YYYY-MM-DD"
           />
         </MuiPickersUtilsProvider>
@@ -66,14 +66,19 @@ const TradeTableToolbar = (props) => {
   );
 };
 
-TradeTableToolbar.propTypes = {
+CustomTableToolbar.propTypes = {
   name: PropTypes.string.isRequired,
-  handleFromDateChange: PropTypes.func.isRequired,
-  handleToDateChange: PropTypes.func.isRequired,
+  handleDateChange: PropTypes.func.isRequired,
   handleSearchChange: PropTypes.func.isRequired,
   handleFilterChange: PropTypes.func.isRequired,
-  selectedFromDate: PropTypes.string.isRequired,
-  selectedToDate: PropTypes.string.isRequired,
+  selectedFromDate: PropTypes.oneOfType([
+    PropTypes.instanceOf(Object),
+    PropTypes.string,
+  ]).isRequired,
+  selectedToDate: PropTypes.oneOfType([
+    PropTypes.instanceOf(Object),
+    PropTypes.string,
+  ]).isRequired,
   searchString: PropTypes.string.isRequired,
   selectedFilter: PropTypes.instanceOf(Array).isRequired,
   filterItem: PropTypes.instanceOf(Object).isRequired,
@@ -81,4 +86,4 @@ TradeTableToolbar.propTypes = {
   searchPlaceHolder: PropTypes.string.isRequired,
 };
 
-export default TradeTableToolbar;
+export default CustomTableToolbar;

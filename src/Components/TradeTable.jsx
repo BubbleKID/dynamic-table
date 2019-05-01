@@ -30,6 +30,38 @@ const filterItem = {
   'ETH/BTC': 'symbol',
 };
 
+function createQuery(
+  searchString, selectedFilter, selectedFromDate, selectedToDate, currentPage, size,
+) {
+  return `
+  {
+    mainQuery (
+      searchString: "${searchString}",
+      filter: ["${selectedFilter.join('","')}"],
+      fromDate: "${selectedFromDate}",
+      toDate: "${selectedToDate}",
+      number: ${currentPage},
+      size: ${size},
+    ){
+      trades {
+        uuid
+        updatedAt
+        volume
+        price
+        side
+        tradingPair {
+          uuid
+          symbol
+        }
+      }
+      pageInfo {
+        total
+      }
+    }
+  }
+  `;
+}
+
 const TradeTable = () => (
   <CustomTable
     name="trades"
@@ -37,6 +69,7 @@ const TradeTable = () => (
     filterItem={filterItem}
     timeString="updatedAt"
     searchPlaceHolder="Uuid, Volume, Price"
+    createQuery={createQuery}
   />
 );
 
