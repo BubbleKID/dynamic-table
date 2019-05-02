@@ -13,6 +13,11 @@ Screentshot
 
 <https://dynamic-table-new.herokuapp.com/>
 
+## Server
+
+<https://github.com/BubbleKID/graphql-table-server>
+<https://graphql-table-server.herokuapp.com/trades>
+
 ## Installation
 
 NPM:
@@ -61,4 +66,4 @@ npm run build
   * [react-router-dom](https://reacttraining.com/react-router/web/guides/quick-start/) - Used to generate routes
   * [material-ui-flat-pagination](https://www.npmjs.com/package/material-ui-flat-pagination/) - Used to generate pagination
   * [material-ui-pickers](https://material-ui-pickers.dev/) - Used to date pickers
-  * [axios](https://www.npmjs.com/package/axios/) - Used to send http request
+  * [graphql](https://www.npmjs.com/package/graphql) - Used to create sever query
