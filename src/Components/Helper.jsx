@@ -9,13 +9,13 @@ export function desc(a, b, orderBy) {
       return 1;
     }
   } else {
-    if (b[orderBy] < a[orderBy]) {
+    if (b[orderBy] * 100 < a[orderBy] * 100) {
       return -1;
     }
     if (typeof [orderBy] === 'object' && b[orderBy].symbol < a[orderBy].symbol) {
       return -1;
     }
-    if (b[orderBy] > a[orderBy]) {
+    if (b[orderBy] * 100 > a[orderBy] * 100) {
       return 1;
     }
   }

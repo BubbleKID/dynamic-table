@@ -31,7 +31,7 @@ const CustomTableContent = (props) => {
                 if (index > 1 && (typeof item !== 'object')) {
                   otherRows = <TableCell key={item} align="right"><Highlighter searchWords={[searchString]} textToHighlight={item} /></TableCell>;
                 }
-                if (typeof item === 'object') {
+                if (typeof item === 'object' && item !== null) {
                   otherRows = <TableCell key={item} align="right">{Object.values(item)[Object.values(item).length - 1]}</TableCell>;
                 }
                 return otherRows;
