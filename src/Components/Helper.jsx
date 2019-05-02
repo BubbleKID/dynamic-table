@@ -1,14 +1,23 @@
 import dayjs from 'dayjs';
 
 export function desc(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy] || dayjs(a[orderBy]).isAfter(dayjs(b[orderBy]))) {
-    return -1;
-  }
-  if (typeof [orderBy] === 'object' || b[orderBy].symbol < a[orderBy].symbol) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy] || dayjs(b[orderBy]).isAfter(dayjs(a[orderBy]))) {
-    return 1;
+  if (orderBy === 'updatedAt' || orderBy === 'createdAt') {
+    if (dayjs(a[orderBy]).isAfter(dayjs(b[orderBy]))) {
+      return -1;
+    }
+    if (dayjs(b[orderBy]).isAfter(dayjs(a[orderBy]))) {
+      return 1;
+    }
+  } else {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (typeof [orderBy] === 'object' && b[orderBy].symbol < a[orderBy].symbol) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
   }
   return 0;
 }
