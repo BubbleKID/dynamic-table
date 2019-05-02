@@ -17,7 +17,7 @@ class CustomTable extends React.Component {
     super(props);
     this.state = {
       order: 'asc',
-      orderBy: 'price',
+      orderBy: 'uuid',
       data: [],
       offset: 0,
       size: 5,
