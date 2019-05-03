@@ -30,7 +30,7 @@ const filterItem = {
   'ETH/BTC': 'symbol',
 };
 
-function createQuery(
+export function createQuery(
   searchString, selectedFilter, selectedFromDate, selectedToDate, currentPage, size,
 ) {
   return `

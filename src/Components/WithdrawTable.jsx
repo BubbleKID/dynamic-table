@@ -24,7 +24,7 @@ const filterItem = {
   REJECTED: 'status',
 };
 
-function createQuery(
+export function createQuery(
   searchString, selectedFilter, selectedFromDate, selectedToDate, currentPage, size,
 ) {
   return `
@@ -57,9 +57,6 @@ const WithdrawTable = () => (
     name="withdraws"
     tableRows={tableRows}
     filterItem={filterItem}
-    keyword1="uuid"
-    keyword2="amount"
-    keyword3="bankReferenceNumber"
     timeString="createdAt"
     searchPlaceHolder="Uuid, Amount, Bank reference number"
     createQuery={createQuery}

@@ -1,15 +1,33 @@
 import {
-  desc,
-  stableSort,
-  getSorting,
-  dateFormat,
+  desc, stableSort, getSorting,
 } from '../../../src/Components/Helper';
 
 describe('desc() function', () => {
   describe('given three values', () => {
     it('it should get compare result 1, -1 or 0', () => {
-      expect(desc({ price: 10 }, { price: 20 }, 'price')).toBe(1);
-      expect(desc({ price: 20 }, { price: 10 }, 'price')).toBe(-1);
+      const a = {
+        price: '10',
+        updatedAt: 'Wed May 16 2018 01:17:41 GMT+1000 (AEST)',
+        tradingPair: {
+          uuid: '493746ad-2269-4fce-8e4a-c2be0f60bebe',
+          symbol: 'ETH/AUD',
+        },
+      };
+      const b = {
+        price: '20',
+        updatedAt: 'Sat May 05 2018 05:20:31 GMT+1000 (AEST)',
+        tradingPair: {
+          uuid: '2d6a3336-a149-43ba-a653-d2fd712a45e2',
+          symbol: 'ETH/BTC',
+        },
+      };
+
+      expect(desc(a, b, 'price')).toBe(1);
+      expect(desc(b, a, 'price')).toBe(-1);
+      expect(desc(b, a, 'updatedAt')).toBe(1);
+      expect(desc(a, b, 'updatedAt')).toBe(-1);
+      expect(desc(b, a, 'tradingPair')).toBe(-1);
+      expect(desc(a, b, 'tradingPair')).toBe(1);
       expect(desc('a', 'b', 'price')).toBe(0);
     });
   });
@@ -23,14 +41,6 @@ describe('stableSort() function', () => {
       expect(stableSort([{ price: 10 }, { price: 20 }], getSorting(0, 'price')))
         .toEqual([{ price: 10 }, { price: 20 }]);
       expect(stableSort(['', ''], getSorting('', ''))).toEqual(['', '']);
-    });
-  });
-});
-
-describe('dateFormat() function', () => {
-  describe('given date values', () => {
-    it('it should get date string in yyyy-MM-dd format', () => {
-      expect(dateFormat('Sat Dec 5 2019 17:28:43 GMT+1000 (澳大利亚东部标准时间)')).toBe('2019-12-05');
     });
   });
 });

@@ -12,8 +12,11 @@ export function desc(a, b, orderBy) {
     if (b[orderBy] * 100 < a[orderBy] * 100) {
       return -1;
     }
-    if (typeof [orderBy] === 'object' && b[orderBy].symbol < a[orderBy].symbol) {
+    if (typeof (b[orderBy]) === 'object' && b[orderBy].symbol < a[orderBy].symbol) {
       return -1;
+    }
+    if (typeof (b[orderBy]) === 'object' && b[orderBy].symbol > a[orderBy].symbol) {
+      return 1;
     }
     if (b[orderBy] * 100 > a[orderBy] * 100) {
       return 1;

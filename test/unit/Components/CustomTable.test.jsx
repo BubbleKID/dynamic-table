@@ -1,12 +1,9 @@
 import React from 'react';
 import Select from '@material-ui/core/Select';
-import TableRow from '@material-ui/core/TableRow';
-import MockAdapter from 'axios-mock-adapter';
-import axios from 'axios';
 import '../../../src/Components/api/server';
 import { shallow } from 'enzyme';
 import CustomTable from '../../../src/Components/TableComponents/CustomTable/CustomTable';
-import { getFilterUrl } from '../../../src/Components/TradeTable';
+import { createQuery } from '../../../src/Components/TradeTable';
 
 let wrapper;
 beforeEach(() => {
@@ -41,11 +38,8 @@ beforeEach(() => {
       }}
       timeString="updatedAt"
       name="trades"
-      keyword1="uuid"
-      keyword2="volume"
-      keyword3="price"
-      getFilterUrl={getFilterUrl}
       searchPlaceHolder="Uuid, Volume, Price"
+      createQuery={createQuery}
     />,
   );
 });
@@ -103,15 +97,8 @@ describe('Test CustomTable', () => {
     expect(wrapper.state('searchString')).toEqual('good');
   });
 
-  it('handleFromDateChange() works correctly', () => {
-    wrapper.instance().handleFromDateChange(new Date('2010-10-10T10:10:10'));
-    const dateString = wrapper.state('selectedFromDate');
-    const convertDate = new Date(dateString).toLocaleDateString('en-US');
-    expect(convertDate).toEqual('10/10/2010');
-  });
-
-  it('handleToDateChange() works correctly', () => {
-    wrapper.instance().handleToDateChange(new Date('2010-10-10T10:10:10'));
+  it('handleDateChange() works correctly', () => {
+    wrapper.instance().handleDateChange(new Date('2010-10-10T10:10:10'), 'selectedToDate');
     const dateString = wrapper.state('selectedToDate');
     const convertDate = new Date(dateString).toLocaleDateString('en-US');
     expect(convertDate).toEqual('10/10/2010');
@@ -126,6 +113,7 @@ describe('Test CustomTable', () => {
   it('handleRequestSort function works correctly', () => {
     const mockedEvent = { target: {} };
     const proptery = 'price';
+
     wrapper.setState({ orderBy: 'price', order: 'desc' });
     wrapper.instance().handleRequestSort(mockedEvent, proptery);
     expect(wrapper.state('orderBy')).toEqual('price');
@@ -134,217 +122,21 @@ describe('Test CustomTable', () => {
     wrapper.instance().handleRequestSort(mockedEvent, proptery);
     expect(wrapper.state('order')).toEqual('desc');
   });
-
-  it('handleCreateTable() works correctly', () => {
-    const mockData1 = [
-      {
-        uuid: '20e31aef-b718-46a5-a7ee-77982e093786',
-        updatedAt: 1526397461000,
-        volume: '8.72005',
-        price: '4874.44',
-        side: 'ASK',
-        tradingPair: {
-          uuid: 'c5229898-0afe-4b87-87e0-de451f6c1f30',
-          symbol: 'ETH/AUD',
-        },
-      },
-    ];
-    wrapper.instance().handleCreateTable(mockData1);
-    expect(wrapper.find(TableRow)).toBeTruthy();
-
-    const mockData2 = [];
-    wrapper.instance().handleCreateTable(mockData2);
-    expect(wrapper.find(TableRow)).toBeTruthy();
-  });
 });
 
 describe('handleTableUpdate() is called', () => {
-  describe('when searchString is empty', () => {
-    let mockData;
-    beforeEach(() => {
-      mockData = {
-        trades: [
-          {
-            uuid: '20e31aef-b718-46a5-a7ee-77982e093786',
-            updatedAt: 1526397461000,
-            volume: '8.72005',
-            price: '4874.44',
-            side: 'ASK',
-            tradingPair: {
-              uuid: 'c5229898-0afe-4b87-87e0-de451f6c1f30',
-              symbol: 'ETH/AUD',
-            },
-          },
-        ],
-        pagination: {
-          number: 1,
-          size: 10,
-          total: 42,
-        },
-      };
+  it('when filterString changes and offset < currentTotal (nomral)', async () => {
+    const mockSuccessResponse = {};
+    const mockJsonPromise = Promise.resolve(mockSuccessResponse);
+    const mockFetchPromise = Promise.resolve({
+      json: () => mockJsonPromise,
     });
-
-    it('when filterString changes and offset < currentTotal (nomral)', async () => {
-      wrapper.setState({
-        searchString: '',
-        total: 42,
-        offset: 20,
-      });
-      const spyHandleTableUpdate = jest.spyOn(wrapper.instance(), 'handleTableUpdate');
-      const mock = new MockAdapter(axios);
-      mock
-        .onGet('https://dynamic-server.herokuapp.com/trades.json?[pagination][number]=1&&[pagination][size]=5')
-        .reply(200, mockData);
-      await wrapper.instance().handleTableUpdate();
-      expect(spyHandleTableUpdate).toHaveBeenCalled();
-    });
-
-    it('when filterString changes and offset > currentTotal ', async () => {
-      wrapper.setState({
-        searchString: '',
-        total: 10,
-        offset: 50,
-      });
-      const spyHandleTableUpdate = jest.spyOn(wrapper.instance(), 'handleTableUpdate');
-      const mock = new MockAdapter(axios);
-      mock
-        .onGet('https://dynamic-server.herokuapp.com/trades.json?[pagination][number]=1&&[pagination][size]=5')
-        .reply(200, mockData);
-      await wrapper.instance().handleTableUpdate();
-      expect(spyHandleTableUpdate).toHaveBeenCalled();
-    });
-
-    it('when filterString changes and currentPage > total page ', async () => {
-      const spyHandleTableUpdate = jest.spyOn(wrapper.instance(), 'handleTableUpdate');
-      const mock = new MockAdapter(axios);
-      wrapper.setState({
-        searchString: '',
-        size: 5,
-        currentPage: 99,
-      });
-      mock.onAny().reply(200, mockData);
-      await wrapper.instance().handleTableUpdate();
-      expect(spyHandleTableUpdate).toHaveBeenCalled();
-    });
-
-    it('when it cant fetch data and throw error ', async () => {
-      const mock = new MockAdapter(axios);
-      wrapper.setState({ searchString: '' });
-      window.console.error = jest.fn();
-      mock.onAny().reply(500);
-      await wrapper.instance().handleTableUpdate();
-      expect(mock.handlers.get[0][3]).toEqual(500);
-    });
-  });
-
-  describe('when searchString is not empty ', () => {
-    it('when filterString changes and offset > total', async () => {
-      const mockData = {
-        trades: [
-          {
-            uuid: '20e31aef-b718-46a5-a7ee-77982e093786',
-            updatedAt: 1526397461000,
-            volume: '8.72005',
-            price: '4874.44',
-            side: 'ASK',
-            tradingPair: {
-              uuid: 'c5229898-0afe-4b87-87e0-de451f6c1f30',
-              symbol: 'ETH/AUD',
-            },
-          },
-        ],
-        pagination: {
-          number: 1,
-          size: 5,
-          total: 10,
-        },
-      };
-      wrapper.setState({
-        searchString: 'aaa',
-        total: 42,
-        size: 5,
-        offset: 50,
-      });
-      const spyHandleTableUpdate = jest.spyOn(wrapper.instance(), 'handleTableUpdate');
-      const mock = new MockAdapter(axios);
-      mock.onAny().reply(200, mockData);
-      await wrapper.instance().handleTableUpdate();
-      expect(spyHandleTableUpdate).toHaveBeenCalled();
-    });
-
-
-    it('when filterString changes and currentPage > total page', async () => {
-      const mockData = {
-        trades: [
-          {
-            uuid: '20e31aef-b718-46a5-a7ee-77982e093786',
-            updatedAt: 1526397461000,
-            volume: '8.72005',
-            price: '4874.44',
-            side: 'ASK',
-            tradingPair: {
-              uuid: 'c5229898-0afe-4b87-87e0-de451f6c1f30',
-              symbol: 'ETH/AUD',
-            },
-          },
-        ],
-        pagination: {
-          number: 1,
-          size: 5,
-          total: 10,
-        },
-      };
-      wrapper.setState({
-        searchString: 'aaa',
-        total: 42,
-        size: 5,
-        currentPage: 20,
-      });
-      const spyHandleTableUpdate = jest.spyOn(wrapper.instance(), 'handleTableUpdate');
-      const mock = new MockAdapter(axios);
-      mock.onAny().reply(200, mockData);
-      await wrapper.instance().handleTableUpdate();
-      expect(spyHandleTableUpdate).toHaveBeenCalled();
-    });
-    it('when it cant fetch data and throw error', async () => {
-      const mock = new MockAdapter(axios);
-      wrapper.setState({ searchString: 'aaa' });
-      window.console.error = jest.fn();
-      mock.reset();
-      mock.onAny().reply(500);
-      await wrapper.instance().handleTableUpdate();
-      expect(mock.handlers.get[0][3]).toEqual(500);
-    });
-
-    it('handleTableUpdate() throw error when it fetches data searchString!=""', async () => {
-      const mock = new MockAdapter(axios);
-      const mockData = {
-        trades: [
-          {
-            uuid: '20e31aef-b718-46a5-a7ee-77982e093786',
-            updatedAt: 1526397461000,
-            volume: '8.72005',
-            price: '4874.44',
-            side: 'ASK',
-            tradingPair: {
-              uuid: 'c5229898-0afe-4b87-87e0-de451f6c1f30',
-              symbol: 'ETH/AUD',
-            },
-          },
-        ],
-        pagination: {
-          number: 1,
-          size: 10,
-          total: 10,
-        },
-      };
-      wrapper.setState({ searchString: 'aaa' });
-      window.console.error = jest.fn();
-      localStorage.setItem = jest.fn();
-      mock.reset();
-      mock.onAny().reply(200, mockData);
-      await wrapper.instance().handleTableUpdate();
-      expect(wrapper.state('total')).not.toBe('');
-    });
+    window.console.error = jest.fn();
+    jest.spyOn(global, 'fetch').mockImplementation(() => mockFetchPromise);
+    const spyHandleTableUpdate = jest.spyOn(wrapper.instance(), 'handleTableUpdate');
+    await wrapper.instance().handleTableUpdate();
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(spyHandleTableUpdate).toHaveBeenCalled();
+    global.fetch.mockClear();
   });
 });

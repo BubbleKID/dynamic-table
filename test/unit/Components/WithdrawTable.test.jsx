@@ -1,8 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { getFilterUrl } from '../../../src/Components/WithdrawTable';
 import CustomTable from '../../../src/Components/TableComponents/CustomTable/CustomTable';
-
+import { createQuery } from '../../../src/Components/WithdrawTable';
 
 it('handleFilterChange() works correctly', () => {
   const wrapper = shallow(
@@ -34,14 +33,10 @@ it('handleFilterChange() works correctly', () => {
         'ETH/AUD': 'symbol',
         'ETH/BTC': 'symbol',
       }}
-      timeString="updatedAt"
-      dbName="trades"
-      name="Trade"
-      keyword1="uuid"
-      keyword2="volume"
-      keyword3="price"
-      getFilterUrl={getFilterUrl}
+      timeString="createdAt"
+      name="Withdraws"
       searchPlaceHolder="Uuid, Volume, Price"
+      createQuery={createQuery}
     />,
   );
   const event = { target: { value: ['PROCESSED', 'REJECTED'] } };

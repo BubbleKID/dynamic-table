@@ -97,8 +97,6 @@ class CustomTable extends React.Component {
     });
   }
 
-  handleFromDateChange = date => this.setState({ selectedFromDate: date })
-
   handleDateChange = (date, name) => this.setState({ [name]: date })
 
   handleFilterChange = event => this.setState({ selectedFilter: event.target.value })
