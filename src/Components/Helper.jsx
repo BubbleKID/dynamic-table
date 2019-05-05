@@ -5,22 +5,19 @@ export function desc(a, b, orderBy) {
     if (dayjs(a[orderBy]).isAfter(dayjs(b[orderBy]))) {
       return -1;
     }
-    if (dayjs(b[orderBy]).isAfter(dayjs(a[orderBy]))) {
-      return 1;
-    }
-  } else {
-    if (b[orderBy] * 100 < a[orderBy] * 100) {
-      return -1;
-    }
-    if (typeof (b[orderBy]) === 'object' && b[orderBy].symbol < a[orderBy].symbol) {
-      return -1;
-    }
-    if (typeof (b[orderBy]) === 'object' && b[orderBy].symbol > a[orderBy].symbol) {
-      return 1;
-    }
-    if (b[orderBy] * 100 > a[orderBy] * 100) {
-      return 1;
-    }
+    return 1;
+  }
+  if (b[orderBy] * 100 < a[orderBy] * 100) {
+    return -1;
+  }
+  if (typeof (b[orderBy]) === 'object' && b[orderBy].symbol < a[orderBy].symbol) {
+    return -1;
+  }
+  if (typeof (b[orderBy]) === 'object' && b[orderBy].symbol > a[orderBy].symbol) {
+    return 1;
+  }
+  if (b[orderBy] * 100 > a[orderBy] * 100) {
+    return 1;
   }
   return 0;
 }
