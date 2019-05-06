@@ -1,8 +1,8 @@
 [![Build Status](https://api.travis-ci.org/BubbleKID/dynamic-table.png)](https://travis-ci.org/BubbleKID/dynamic-table/)
-[![Coverage Status](https://coveralls.io/repos/github/BubbleKID/dynamic-table/badge.svg?branch=master&kill_cache=1)](https://coveralls.io/github/BubbleKID/dynamic-table?branch=master)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e98175effb564be1899dc61a4bc4f63e)](https://www.codacy.com/app/BubbleKID/dynamic-table?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=BubbleKID/dynamic-table&amp;utm_campaign=Badge_Grade)
+[![Coverage Status](https://coveralls.io/repos/github/BubbleKID/dynamic-table/badge.svg?maxAge=2592000)](https://coveralls.io/github/BubbleKID/dynamic-table?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e98175effb564be1899dc61a4bc4f63e?maxAge=2592000)](https://www.codacy.com/app/BubbleKID/dynamic-table?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=BubbleKID/dynamic-table&amp;utm_campaign=Badge_Grade)
 [![Heroku](https://heroku-badge.herokuapp.com/?app=dynamic-table-new&svg=1)](https://dynamic-table-new.herokuapp.com/)
-![Size Badge](https://img.shields.io/github/size/BubbleKID/dynamic-table/dist/bundle.js.svg)
+![Size Badge](https://img.shields.io/github/size/BubbleKID/dynamic-table/dist/bundle.js.svg?maxAge=2592000)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://choosealicense.com/licenses/mit)
 [![LinkedIn](https://img.shields.io/badge/-LinkedIn-black.svg?&logo=linkedin&colorB=555)](https://www.linkedin.com/in/xin-chen-mark/)
 
