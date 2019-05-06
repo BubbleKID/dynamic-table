@@ -10,7 +10,7 @@
 <p align="center">
   <h3 align="center">Dynamic Table</h3>
   <p align="center">
-    An dynamic table application that create by react and material-ui
+    An dynamic table application that created by react and material-ui
     <br />
     <a href="https://github.com/BubbleKID/dynamic-table/blob/master/README.md"><strong>Explore the docs »</strong></a>
     <br />
